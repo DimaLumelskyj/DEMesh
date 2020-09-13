@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="./configuration/nlog.config" />
+        <None Remove="nlog.config" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="./configuration/nlog.config">
+        <Content Include="nlog.config">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -27,6 +27,8 @@
    
     <ItemGroup>
       <Folder Include="obj" />
+      <Folder Include="src\entities\discrete.element" />
+      <Folder Include="src\entities\finite.element" />
     </ItemGroup>
 
 </Project>
