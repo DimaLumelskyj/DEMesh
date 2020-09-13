@@ -1,12 +1,32 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 namespace ippt.dem.mesh.app
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+
+            using (var serviceProvider = services.BuildServiceProvider())
+            {
+                var app = serviceProvider.GetService<MeshApp>();
+                app.Run();
+            }
+        }
+
+        private static void ConfigureServices(ServiceCollection services)
+        {
+            services.AddTransient<MeshApp>();
+
+            services.AddLogging(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.Information);
+                builder.AddNLog(".\\configuration\\nlog.config");
+            });
         }
     }
 }

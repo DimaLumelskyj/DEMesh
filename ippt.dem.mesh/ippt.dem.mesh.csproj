@@ -6,9 +6,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="src\entities\api" />
-      <Folder Include="src\entities\element\discrete" />
-      <Folder Include="src\entities\element\finite" />
+        <None Remove="./configuration/nlog.config" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="./configuration/nlog.config">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+        <Content Include="nlog.config" />
+    </ItemGroup>
+   
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.8.20407.11" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0-preview.8.20407.11" />
+      <PackageReference Include="NLog.Extensions.Logging" Version="1.6.5" />
+      <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.3" />
+    </ItemGroup>
+   
+    <ItemGroup>
+      <Folder Include="obj" />
     </ItemGroup>
 
 </Project>
