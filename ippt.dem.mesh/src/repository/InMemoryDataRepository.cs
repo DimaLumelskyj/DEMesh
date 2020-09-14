@@ -28,7 +28,7 @@ namespace ippt.dem.mesh.repository
 
         public void AddElement(IElement element)
         {
-            _elements.Add(element);
+            //_elements.Add(element);
         }
     }
 }

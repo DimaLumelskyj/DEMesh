@@ -35,7 +35,7 @@ namespace ippt.dem.mesh.system.parser
             ParseNodes(data.GetRange(nodesPosition.GetBegin(),nodesPosition.GetRange()));
             foreach (var position in elementsPositions)
             {
-                ParseElementsSet(data.GetRange(position.GetBegin(),position.GetRange()));
+                ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1));
             }
         }
 
@@ -48,8 +48,8 @@ namespace ippt.dem.mesh.system.parser
                 try
                 {
                     var elementData = line.Split(',').ToList();
-                    if (elementData.Count != NumberOfElementsInHexahedronElementLineString ||
-                        elementData.Count != NumberOfElementsInTetrahedronElementLineString)
+                    bool a = elementData.Count == NumberOfElementsInHexahedronElementLineString && elementData.Count == NumberOfElementsInTetrahedronElementLineString;
+                    if (a)
                     {
                         throw new InvalidDataException($"Wrong elements data read: {line}");
                     }
@@ -59,7 +59,7 @@ namespace ippt.dem.mesh.system.parser
                     {
                         nodesID.Add(long.Parse(elementData[i]));
                     }
-                    _dataRepository.AddElement();
+                   // _dataRepository.AddElement();
                     
                 }
                 catch (Exception e)
@@ -120,7 +120,7 @@ namespace ippt.dem.mesh.system.parser
             
             for (var i = 0; i < positions.Count/2; i++)
             {
-                result.Add(new Position(positions[i]+1,positions[i+1]));
+                result.Add(new Position(positions[2*i]+1,positions[2*i+1]));
             }
             
             return result;
