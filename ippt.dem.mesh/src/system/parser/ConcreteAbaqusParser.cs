@@ -1,36 +1,110 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
+using ippt.dem.mesh.entities.core;
+using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
 
 namespace ippt.dem.mesh.system.parser
 {
     public class ConcreteAbaqusParser:IAbaqusParser
     {
-        private readonly string NODES_BEGIN = @"^\*\*NODE DATA BEGIN";
-        private readonly string NODES_END = @"^\*\*NODE DATA END";
-        private readonly string ELEMENTS_MASK = @"^\*\*ELEMENTS \(HEXAHEDRA\) \- Part\: Mask*";
-        
-        private DataRepository dataRepository;
+        private const string NodesBegin = @"^\*\*NODE DATA BEGIN";
+        private const string NodesEnd = @"^\*\*NODE DATA END";
+        private const string ElementsMask = @"^\*\*ELEMENTS \(HEXAHEDRA\) \- Part\: Mask*";
+        private const int NumberOfElementsInNodeLineString = 4; // 3 coordinates + 1 node id
+        private const int NumberOfElementsInHexahedronElementLineString = 9; // 8 vertices + 1 element id
+        private const int NumberOfElementsInTetrahedronElementLineString = 5; // 4 vertices + 1 element id
+       
+        private readonly DataRepository _dataRepository;
+        private readonly NodeCreator _nodeCreator;
 
-        public ConcreteAbaqusParser(DataRepository dataRepository)
+        public ConcreteAbaqusParser(DataRepository dataRepository, NodeCreator nodeCreator)
         {
-            this.dataRepository = dataRepository;
+            _dataRepository = dataRepository;
+            _nodeCreator = nodeCreator;
         }
 
         public void parse(List<string> data)
         {
-            var nodesPosition = GetNodePositions(data);
+            Position nodesPosition = GetNodePositions(data);
             List<Position> elementsPositions = GetElementPositions(data);
+            ParseNodes(data.GetRange(nodesPosition.GetBegin(),nodesPosition.GetRange()));
+            foreach (var position in elementsPositions)
+            {
+                ParseElementsSet(data.GetRange(position.GetBegin(),position.GetRange()));
+            }
+        }
 
+        private void ParseElementsSet(List<string> elements)
+        {
+            var nodesID = new List<long>();
+            foreach (var line in elements)
+            {
+                nodesID.Clear();
+                try
+                {
+                    var elementData = line.Split(',').ToList();
+                    if (elementData.Count != NumberOfElementsInHexahedronElementLineString ||
+                        elementData.Count != NumberOfElementsInTetrahedronElementLineString)
+                    {
+                        throw new InvalidDataException($"Wrong elements data read: {line}");
+                    }
+
+                    var id = long.Parse(elementData[0]);
+                    for (var i = 1; i < elementData.Capacity; i++)
+                    {
+                        nodesID.Add(long.Parse(elementData[i]));
+                    }
+                    _dataRepository.AddElement();
+                    
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidDataException($"Wrong nodes data read: {line}");
+                }
+            }
+        }
+        
+        private void ParseNodes(List<string> nodes)
+        {
+            var coordinates = new List<double>();
+            foreach (var line in nodes)
+            {
+                coordinates.Clear();
+                try
+                {
+                    var nodeData = line.Split(',').ToList();
+                    if (nodeData.Count != NumberOfElementsInNodeLineString)
+                    {
+                        throw new InvalidDataException($"Wrong nodes data read: {line}");
+                    }
+
+                    var id = long.Parse(nodeData[0]);
+                    for (var i = 1; i < 4; i++)
+                    {
+                        coordinates.Add(double.Parse(nodeData[i]));
+                    }
+                    _dataRepository.AddNode(_nodeCreator.FactoryMethod(NodeDto.Get(id,coordinates)));
+                    
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidDataException($"Wrong nodes data read: {line}");
+                }
+            }
         }
         
         private List<Position> GetElementPositions(List<string> data)
         {
-            /*
-                offset for begin is 1 lines
-                offset for end is 0 line
-            */
+             /*
+                 Abaqus format:
+                 offset for begin is 1 lines
+                 offset for end is 0 line
+             */
             List<Position> result = new List<Position>();
 
             List<long> positions = new List<long>();
@@ -38,7 +112,7 @@ namespace ippt.dem.mesh.system.parser
             for (var i = 0; i < data.Count; i++)
             {
                 // Match the start of a string.
-                if (Regex.IsMatch(data[(int) i], ELEMENTS_MASK))
+                if (Regex.IsMatch(data[(int) i], ElementsMask))
                 {
                     positions.Add(i);
                 }
@@ -55,25 +129,13 @@ namespace ippt.dem.mesh.system.parser
         private Position GetNodePositions(List<string> data)
         {
             /*
-            offset for begin is 5 lines
-            offset for end is -1 line
-            
-            **NODE DATA BEGIN
-            **==============================================================================
-            *NODE
-            **------------------------------------------------------------------------------
-            **INDEX, X COORD, Y COORD, Z COORD
-            **------------------------------------------------------------------------------
-             
-            .................................................................................
-            
-            **==============================================================================
-            **NODE DATA END
-            **==============================================================================
+                Abaqus format:
+                offset for begin is 5 lines
+                offset for end is -1 line
             */
             
-            var begin = SearchLine(data, 0, NODES_BEGIN) + 5;
-            var end = SearchLine(data, begin + 1, NODES_END) - 1;
+            var begin = SearchLine(data, 0, NodesBegin) + 6;
+            var end = SearchLine(data, begin + 1, NodesEnd) - 1;
             return new Position(begin,end);
         }
 
@@ -103,13 +165,23 @@ namespace ippt.dem.mesh.system.parser
 
     internal class Position
     {
-        long begin { get; }
-        long end { get; }
+        private long begin;
+        private long end;
 
         public Position(long begin, long end)
         {
             this.begin = begin;
             this.end = end;
+        }
+
+        public int GetBegin()
+        {
+            return (int) begin;
+        }
+        
+        public int GetRange()
+        {
+            return (int) (end-begin);
         }
     }
 }

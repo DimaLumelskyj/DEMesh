@@ -28,7 +28,6 @@
     <ItemGroup>
       <Folder Include="obj" />
       <Folder Include="src\entities\discrete.element" />
-      <Folder Include="src\entities\finite.element" />
     </ItemGroup>
 
 </Project>

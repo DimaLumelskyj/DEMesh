@@ -1,4 +1,5 @@
-﻿using ippt.dem.mesh.repository;
+﻿using ippt.dem.mesh.entities.nodes;
+using ippt.dem.mesh.repository;
 using ippt.dem.mesh.system;
 using ippt.dem.mesh.system.parser;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,7 @@ namespace ippt.dem.mesh.app
             services.AddSingleton<ICoreTextFileRead, CoreTextFileReadImpl>();
             services.AddSingleton<DataRepository, InMemoryDataRepository>();
             services.AddSingleton<IAbaqusParser, ConcreteAbaqusParser>();
+            services.AddSingleton<NodeCreator,ConcreteNodeCreator>();
         }
     }
 }

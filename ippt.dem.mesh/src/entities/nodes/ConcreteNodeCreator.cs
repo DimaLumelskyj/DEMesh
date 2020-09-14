@@ -10,26 +10,4 @@ namespace ippt.dem.mesh.entities.nodes
             return new Node(nodeDto);
         }
     }
-
-    public class Node : INode
-    {
-        private long Id;
-        private List<double> ListOfCoordinates; 
-        
-        public Node(NodeDto nodeDto)
-        {
-            this.Id = nodeDto.Id;
-            this.ListOfCoordinates = nodeDto.ListOfCoordinates;
-        }
-
-        public long GetId()
-        {
-            return Id;
-        }
-
-        public List<double> GetCoordinates()
-        {
-            return ListOfCoordinates;
-        }
-    }
 }
