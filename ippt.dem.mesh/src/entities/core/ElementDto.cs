@@ -6,16 +6,18 @@ namespace ippt.dem.mesh.entities.core
     {
         private readonly long _id;
         private readonly List<long> _listOfNodes;
+        private readonly int _group;
 
-        private ElementDto(long id, List<long> listOfNodes)
+        private ElementDto(long id, List<long> listOfNodes, int group)
         {
             _id = id;
             _listOfNodes = listOfNodes;
+            _group = group;
         }
         
-        public static ElementDto Get(long id, List<long> listOfNodes)
+        public static ElementDto Get(long id, List<long> listOfNodes, int group)
         {
-            return new ElementDto(id, listOfNodes);
+            return new ElementDto(id, listOfNodes, group );
         }
 
         public long GetId()
@@ -26,6 +28,11 @@ namespace ippt.dem.mesh.entities.core
         public List<long> GetNodesId()
         {
             return _listOfNodes;
+        }
+
+        public override string ToString()
+        {
+            return $"Element with id={_id.ToString()}\nnode vertices list: {_listOfNodes}";
         }
     }
 }
