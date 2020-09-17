@@ -23,9 +23,22 @@ namespace ippt.dem.mesh.repository
             _nodes.Add(node.GetId(),node);
         }
 
-        public INode GetById(long id)
+        public INode GetNodeById(long id)
         {
             return _nodes[id];
+        }
+
+        public IElement GetElementById(long id)
+        {
+            return _elements[id];
+        }
+
+        public Dictionary<long, INode> GetElementNodes(long id)
+        {
+            var elementVerticies = new Dictionary<long, INode>();
+            long i = -1;
+            GetElementById(id).GetVerticesId().ForEach(nodeId =>elementVerticies.Add(i++,GetNodeById(nodeId)));;
+            return elementVerticies;
         }
 
         public void AddElement(IElement element)

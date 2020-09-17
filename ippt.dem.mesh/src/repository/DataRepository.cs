@@ -8,7 +8,9 @@ namespace ippt.dem.mesh.repository
     public interface DataRepository
     {
         public void AddNode(INode node);
-        public INode GetById(long id);
+        public INode GetNodeById(long id);
+        public IElement GetElementById(long id);
+        public Dictionary<long, INode> GetElementNodes(long id);
         public void AddElement(IElement element);
         public void InitializeGroupElementIds(List<int> groupsId);
     }

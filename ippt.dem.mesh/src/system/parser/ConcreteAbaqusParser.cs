@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using ippt.dem.mesh.entities.core;
+using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
@@ -23,14 +24,16 @@ namespace ippt.dem.mesh.system.parser
         private readonly DataRepository _dataRepository;
         private readonly NodeCreator _nodeCreator;
         private readonly ElementCreator _elementCreator;
+        private readonly DiscreteElementCreator _discreteElementCreator;
 
         public ConcreteAbaqusParser(DataRepository dataRepository,
             NodeCreator nodeCreator,
-            ElementCreator elementCreator)
+            ElementCreator elementCreator, DiscreteElementCreator discreteElementCreator)
         {
             _dataRepository = dataRepository;
             _nodeCreator = nodeCreator;
             _elementCreator = elementCreator;
+            _discreteElementCreator = discreteElementCreator;
         }
 
         public void parse(List<string> data)
@@ -77,7 +80,8 @@ namespace ippt.dem.mesh.system.parser
                     }
                     
                     _dataRepository.AddElement(_elementCreator.FactoryMethod(ElementDto.Get(id,verticiesID,group)));
-                    
+                    //_dataRepository.AddSimpleSphere(_discreteElementCreator.FactoryMethod(DiscreteElementDto.Get));
+
                 }
                 catch (Exception e)
                 {
