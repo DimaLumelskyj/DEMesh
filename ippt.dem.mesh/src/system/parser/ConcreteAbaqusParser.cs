@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using ippt.dem.mesh.entities.core;
+using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
 
@@ -21,11 +22,15 @@ namespace ippt.dem.mesh.system.parser
        
         private readonly DataRepository _dataRepository;
         private readonly NodeCreator _nodeCreator;
+        private readonly ElementCreator _elementCreator;
 
-        public ConcreteAbaqusParser(DataRepository dataRepository, NodeCreator nodeCreator)
+        public ConcreteAbaqusParser(DataRepository dataRepository,
+            NodeCreator nodeCreator,
+            ElementCreator elementCreator)
         {
             _dataRepository = dataRepository;
             _nodeCreator = nodeCreator;
+            _elementCreator = elementCreator;
         }
 
         public void parse(List<string> data)
@@ -33,18 +38,29 @@ namespace ippt.dem.mesh.system.parser
             Position nodesPosition = GetNodePositions(data);
             List<Position> elementsPositions = GetElementPositions(data);
             ParseNodes(data.GetRange(nodesPosition.GetBegin(),nodesPosition.GetRange()));
+            _dataRepository.InitializeGroupElementIds(GetGroupList(elementsPositions));
             foreach (var position in elementsPositions)
             {
-                ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1));
+                ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1), position.GetId());
             }
         }
 
-        private void ParseElementsSet(List<string> elements)
+        private static List<int> GetGroupList(List<Position> positions)
         {
-            var nodesID = new List<long>();
+            List<int> groups = new List<int>();
+            foreach (var position in positions)
+            {
+                 groups.Add(position.GetId());
+            }
+            return groups;
+        }
+
+        private void ParseElementsSet(List<string> elements, int group)
+        {
+            var verticiesID = new List<long>();
             foreach (var line in elements)
             {
-                nodesID.Clear();
+                verticiesID.Clear();
                 try
                 {
                     var elementData = line.Split(',').ToList();
@@ -57,9 +73,10 @@ namespace ippt.dem.mesh.system.parser
                     var id = long.Parse(elementData[0]);
                     for (var i = 1; i < elementData.Capacity; i++)
                     {
-                        nodesID.Add(long.Parse(elementData[i]));
+                        verticiesID.Add(long.Parse(elementData[i]));
                     }
-                    // _dataRepository.AddElement();
+                    
+                    _dataRepository.AddElement(_elementCreator.FactoryMethod(ElementDto.Get(id,verticiesID,group)));
                     
                 }
                 catch (Exception e)
@@ -120,7 +137,7 @@ namespace ippt.dem.mesh.system.parser
             
             for (var i = 0; i < positions.Count/2; i++)
             {
-                result.Add(new Position(positions[2*i]+1,positions[2*i+1]));
+                result.Add(new Position(positions[2*i]+1,positions[2*i+1],i+1));
             }
             
             return result;
@@ -136,7 +153,7 @@ namespace ippt.dem.mesh.system.parser
             
             var begin = SearchLine(data, 0, NodesBegin) + 6;
             var end = SearchLine(data, begin + 1, NodesEnd) - 1;
-            return new Position(begin,end);
+            return new Position(begin,end,1);
         }
 
         private long SearchLine(List<string> data, long offset, string pattern)
@@ -165,23 +182,30 @@ namespace ippt.dem.mesh.system.parser
 
     internal class Position
     {
-        private long begin;
-        private long end;
+        private readonly long _begin;
+        private readonly long _end;
+        private readonly int _id;
 
-        public Position(long begin, long end)
+        public Position(long begin, long end, int id)
         {
-            this.begin = begin;
-            this.end = end;
+            this._begin = begin;
+            this._end = end;
+            _id = id;
         }
 
         public int GetBegin()
         {
-            return (int) begin;
+            return (int) _begin;
         }
         
         public int GetRange()
         {
-            return (int) (end-begin);
+            return (int) (_end-_begin);
+        }
+
+        public int GetId()
+        {
+            return _id;
         }
     }
 }

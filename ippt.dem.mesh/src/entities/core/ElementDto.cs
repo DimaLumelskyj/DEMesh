@@ -29,6 +29,11 @@ namespace ippt.dem.mesh.entities.core
         {
             return _listOfNodes;
         }
+        
+        public int GetGroupId()
+        {
+            return _group;
+        }
 
         public override string ToString()
         {

@@ -11,11 +11,14 @@ namespace ippt.dem.mesh.entities.finite.element
         private readonly List<long> _verticesId;
 
         private const ElementType Type = ElementType.Hexahedron;
+        
+        private readonly int _groupId;
 
         public HexahedronElement(ElementDto elementDto)
         {
             _verticesId = elementDto.GetNodesId();
             _id = elementDto.GetId();
+            _groupId = elementDto.GetGroupId();
         }
         
         public long GetId()
@@ -36,6 +39,11 @@ namespace ippt.dem.mesh.entities.finite.element
         public IDiscreteElement GetSimpleFilledSphereDiscreteElement()
         {
             throw new System.NotImplementedException();
+        }
+
+        public int GetGroup()
+        {
+            return _groupId;
         }
     }
 }

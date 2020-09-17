@@ -1,4 +1,5 @@
-﻿using ippt.dem.mesh.entities.nodes;
+﻿using ippt.dem.mesh.entities.finite.element;
+using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
 using ippt.dem.mesh.system;
 using ippt.dem.mesh.system.parser;
@@ -38,6 +39,7 @@ namespace ippt.dem.mesh.app
             services.AddSingleton<DataRepository, InMemoryDataRepository>();
             services.AddSingleton<IAbaqusParser, ConcreteAbaqusParser>();
             services.AddSingleton<NodeCreator,ConcreteNodeCreator>();
+            services.AddSingleton<ElementCreator,ConcreteElementCreator>();
         }
     }
 }
