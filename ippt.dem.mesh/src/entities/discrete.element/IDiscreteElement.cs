@@ -11,5 +11,7 @@ namespace ippt.dem.mesh.entities.discrete.element
         public long GetCenterNodeId();
 
         public double GetRadius();
+
+        public int GetGroupId();
     }
 }

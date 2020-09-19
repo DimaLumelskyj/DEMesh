@@ -44,8 +44,11 @@ namespace ippt.dem.mesh.repository
         public Dictionary<long, INode> GetElementNodes(long id)
         {
             var elementVerticies = new Dictionary<long, INode>();
-            long i = -1;
-            GetElementById(id).GetVerticesId().ForEach(nodeId =>elementVerticies.Add(i++,GetNodeById(nodeId)));;
+            var nodesList = GetElementById(id).GetVerticesId();
+            for (var i = 0; i < nodesList.Count; i++)
+            {
+                elementVerticies.Add(i,GetNodeById(nodesList[i]));
+            }
             return elementVerticies;
         }
 
@@ -66,7 +69,9 @@ namespace ippt.dem.mesh.repository
 
         public void AddSimpleSphere(IDiscreteElement discreteElement, INode node)
         {
-            
+            _discreteElements.Add(discreteElement.GetId(),discreteElement);
+            _groupDiscreteElementIds[discreteElement.GetGroupId()].Add(discreteElement.GetId());
+            _discreteElementNodes.Add(node.GetId(),node);
         }
     }
 }

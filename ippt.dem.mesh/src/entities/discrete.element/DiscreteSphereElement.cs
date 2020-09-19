@@ -37,5 +37,10 @@ namespace ippt.dem.mesh.entities.discrete.element
         {
             return _radius;
         }
+
+        public int GetGroupId()
+        {
+            return _groupId;
+        }
     }
 }
