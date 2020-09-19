@@ -80,8 +80,14 @@ namespace ippt.dem.mesh.system.parser
                     }
                     
                     _dataRepository.AddElement(_elementCreator.FactoryMethod(ElementDto.Get(id,verticiesID,group)));
-                    //_dataRepository.AddSimpleSphere(_discreteElementCreator.FactoryMethod(DiscreteElementDto.Get));
-
+                    _dataRepository.AddSimpleSphere(
+                        _dataRepository
+                            .GetElementById(id)
+                            .GetSimpleFilledSphereDiscreteElement(_dataRepository.GetElementNodes(id),id,group),
+                        _nodeCreator.FactoryMethod(
+                            _dataRepository
+                            .GetElementById(id)
+                            .GetCenterNodeInElement(_dataRepository.GetElementNodes(id),id)));
                 }
                 catch (Exception e)
                 {

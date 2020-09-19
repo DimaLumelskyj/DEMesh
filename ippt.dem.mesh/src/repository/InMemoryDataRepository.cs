@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
 
@@ -11,11 +12,18 @@ namespace ippt.dem.mesh.repository
         private readonly Dictionary<long, IElement> _elements;
         private readonly Dictionary<long, List<long>> _groupElementIds;
         
+        private readonly Dictionary<long, IDiscreteElement> _discreteElements;
+        private readonly Dictionary<long, List<long>> _groupDiscreteElementIds;
+        private readonly Dictionary<long,INode> _discreteElementNodes;
+        
         public InMemoryDataRepository()
         {
             _nodes = new Dictionary<long, INode>(); 
             _elements = new Dictionary<long, IElement>();
             _groupElementIds = new Dictionary<long, List<long>>();
+            _discreteElements = new Dictionary<long, IDiscreteElement>();
+            _groupDiscreteElementIds = new Dictionary<long, List<long>>();
+            _discreteElementNodes = new Dictionary<long, INode>();
         }
         
         public void AddNode(INode node)
@@ -52,7 +60,13 @@ namespace ippt.dem.mesh.repository
             foreach (var id in groupsId)
             {
                _groupElementIds.Add(id, new List<long>()); 
+               _groupDiscreteElementIds.Add(id, new List<long>());
             }
+        }
+
+        public void AddSimpleSphere(IDiscreteElement discreteElement, INode node)
+        {
+            
         }
     }
 }

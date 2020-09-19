@@ -37,7 +37,7 @@ namespace ippt.dem.mesh.entities.finite.element
             return _verticesId;
         }
 
-        public IDiscreteElement GetSimpleFilledSphereDiscreteElement(Dictionary<long, INode> elementNodes)
+        public IDiscreteElement GetSimpleFilledSphereDiscreteElement(Dictionary<long, INode> elementNodes, long centerNodeId, int groupId)
         {
             throw new System.NotImplementedException();
         }
@@ -45,6 +45,11 @@ namespace ippt.dem.mesh.entities.finite.element
         public int GetGroup()
         {
             return _groupId;
+        }
+
+        public NodeDto GetCenterNodeInElement(Dictionary<long, INode> getElementNodes, long id)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

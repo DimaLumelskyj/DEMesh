@@ -15,7 +15,7 @@
             _groupId = groupId;
         }
 
-        public DiscreteElementDto Get(long id, double radius, long nodeId, int groupId)
+        public static DiscreteElementDto Get(long id, double radius, long nodeId, int groupId)
         {
             return new DiscreteElementDto(id,radius,nodeId,groupId);
         }
