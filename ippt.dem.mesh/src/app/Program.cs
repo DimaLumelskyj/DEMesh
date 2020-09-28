@@ -15,7 +15,7 @@ namespace ippt.dem.mesh.app
         private static void Main(string[] args)
         {
             
-            string path = @"1_50.inp";
+            string path = @"/Users/dmytro.lumelskyj/Downloads/WW/2_elem.inp";
             
             var services = new ServiceCollection();
             ConfigureServices(services);
@@ -23,7 +23,7 @@ namespace ippt.dem.mesh.app
             using (var serviceProvider = services.BuildServiceProvider())
             {
                 var app = serviceProvider.GetService<MeshApp>();
-                app.Run(path);
+                app?.Run(path);
             }
         }
 

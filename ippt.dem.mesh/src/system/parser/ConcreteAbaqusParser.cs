@@ -79,7 +79,7 @@ namespace ippt.dem.mesh.system.parser
                         verticiesID.Add(long.Parse(elementData[i]));
                     }
                     
-                    _dataRepository.AddElement(_elementCreator.FactoryMethod(ElementDto.Get(id,verticiesID,group)));
+                    _dataRepository.AddElement(_elementCreator.FactoryMethod(ElementDto.Get(id,new List<long>(verticiesID),group)));
                     _dataRepository.AddSimpleSphere(
                         _dataRepository
                             .GetElementById(id)

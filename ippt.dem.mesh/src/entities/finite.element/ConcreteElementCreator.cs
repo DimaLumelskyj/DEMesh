@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ippt.dem.mesh.entities.core;
 using ippt.dem.mesh.entities.discrete.element;
+using ippt.dem.mesh.repository;
 using ippt.dem.mesh.system.parser;
 
 namespace ippt.dem.mesh.entities.finite.element
@@ -10,10 +11,13 @@ namespace ippt.dem.mesh.entities.finite.element
         private const int NumberOfVerticesInHexahedron = 8;
         private const int NumberOfVerticesInTetrahaedr = 4;
         private readonly DiscreteElementCreator _discreteElementCreator;
+        private readonly DataRepository _dataRepository;
 
-        public ConcreteElementCreator(DiscreteElementCreator discreteElementCreator)
+        public ConcreteElementCreator(DiscreteElementCreator discreteElementCreator,
+            DataRepository dataRepository)
         {
             _discreteElementCreator = discreteElementCreator;
+            _dataRepository = dataRepository;
         }
 
         public override IElement FactoryMethod(ElementDto elementDto)
@@ -21,7 +25,7 @@ namespace ippt.dem.mesh.entities.finite.element
             switch (elementDto.GetNodesId().Count)
             {
                 case NumberOfVerticesInHexahedron: 
-                    return new HexahedronElement(elementDto, _discreteElementCreator);
+                    return new HexahedronElement(elementDto, _discreteElementCreator, _dataRepository);
                 case NumberOfVerticesInTetrahaedr:
                     return new TetrahaedrElement(elementDto);
                 default:

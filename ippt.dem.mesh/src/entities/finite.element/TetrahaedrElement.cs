@@ -51,5 +51,10 @@ namespace ippt.dem.mesh.entities.finite.element
         {
             throw new System.NotImplementedException();
         }
+
+        public void FindNeighbourElements()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

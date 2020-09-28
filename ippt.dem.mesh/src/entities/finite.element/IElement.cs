@@ -20,5 +20,7 @@ namespace ippt.dem.mesh.entities.finite.element
 
         public int GetGroup();
         public NodeDto GetCenterNodeInElement(Dictionary<long, INode> getElementNodes, long id);
+
+        public void FindNeighbourElements();
     }
 }
