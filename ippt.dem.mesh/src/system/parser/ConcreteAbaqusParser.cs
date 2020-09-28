@@ -115,7 +115,7 @@ namespace ippt.dem.mesh.system.parser
                     {
                         coordinates.Add(double.Parse(nodeData[i]));
                     }
-                    _dataRepository.AddNode(_nodeCreator.FactoryMethod(NodeDto.Get(id,coordinates)));
+                    _dataRepository.AddNode(_nodeCreator.FactoryMethod(NodeDto.Get(id,new List<double>(coordinates))));
                     
                 }
                 catch (Exception e)
