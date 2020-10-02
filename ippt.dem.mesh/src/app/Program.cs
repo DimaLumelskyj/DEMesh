@@ -4,13 +4,14 @@ using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
 using ippt.dem.mesh.system;
 using ippt.dem.mesh.system.parser;
+using ippt.dem.mesh.system.write;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 
 namespace ippt.dem.mesh.app
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main(string[] args)
         {
@@ -42,6 +43,7 @@ namespace ippt.dem.mesh.app
             services.AddSingleton<NodeCreator,ConcreteNodeCreator>();
             services.AddSingleton<ElementCreator,ConcreteElementCreator>();
             services.AddSingleton<DiscreteElementCreator, ConcreteDiscreteElementCreator>();
+            services.AddSingleton<IWriteOutputResults, WriteOutputResults>();
         }
     }
 }

@@ -15,5 +15,7 @@ namespace ippt.dem.mesh.repository
         public void AddElement(IElement element);
         public void InitializeGroupElementIds(List<int> groupsId);
         public void AddSimpleSphere(IDiscreteElement discreteElement, INode node);
+
+        public Dictionary<long, List<long>> GetDiscreteElementGroup();
     }
 }

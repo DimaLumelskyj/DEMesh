@@ -73,5 +73,10 @@ namespace ippt.dem.mesh.repository
             _groupDiscreteElementIds[discreteElement.GetGroupId()].Add(discreteElement.GetId());
             _discreteElementNodes.Add(node.GetId(),node);
         }
+
+        public Dictionary<long, List<long>> GetDiscreteElementGroup()
+        {
+            return _groupDiscreteElementIds;
+        }
     }
 }
