@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ippt.dem.mesh.repository;
 
 namespace ippt.dem.mesh.entities.nodes
 {
@@ -6,5 +7,6 @@ namespace ippt.dem.mesh.entities.nodes
     {
         public long GetId();
         public List<double> GetCoordinates();
+        public string ToString(FileFormat format);
     }
 }

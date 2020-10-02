@@ -10,11 +10,11 @@ namespace ippt.dem.mesh.system
 {
     public class CoreTextFileReadImpl : ICoreTextFileRead
     {
-        private readonly ILogger log;
+        private readonly ILogger _log;
 
         public CoreTextFileReadImpl(ILogger<CoreTextFileReadImpl> log)
         {
-            this.log = log;
+            this._log = log;
         }
 
         public List<string> ReadFromFile(string path)
@@ -25,7 +25,7 @@ namespace ippt.dem.mesh.system
             
             try
             {
-                log.LogInformation($"Reading file: {path}");
+                _log.LogInformation($"Reading file: {path}");
 
                 using (StreamReader streamReader = new StreamReader(path))
                 {
@@ -36,14 +36,14 @@ namespace ippt.dem.mesh.system
                 }
                 
                 stopwatch.Stop();
-                log.LogInformation(
+                _log.LogInformation(
                     $"File successfully read into memory, elapsed={TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds).TotalSeconds.ToString()} [seconds]");
                 return result;
             }
             catch (Exception e)
             {
-                log.LogError($"Reading file: {path} error");
-                log.LogError($"Stacktrace:\n {e}");
+                _log.LogError($"Reading file: {path} error");
+                _log.LogError($"Stacktrace:\n {e}");
                 throw new FileLoadException(e.Message);
             }
         }

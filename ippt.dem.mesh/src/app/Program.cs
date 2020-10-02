@@ -16,7 +16,7 @@ namespace ippt.dem.mesh.app
         private static void Main(string[] args)
         {
             
-            string path = @"/Users/dmytro.lumelskyj/Downloads/WW/2_elem.inp";
+            string path = @"C:\Users\dimal\RiderProjects\DEMesh\ippt.dem.mesh\bin\Debug\netcoreapp3.1\1_100.inp";
             
             var services = new ServiceCollection();
             ConfigureServices(services);

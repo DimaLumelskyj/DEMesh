@@ -31,9 +31,19 @@ namespace ippt.dem.mesh.repository
             _nodes.Add(node.GetId(),node);
         }
 
-        public INode GetNodeById(long id)
+        public INode GetFiniteElementNodeById(long id)
         {
             return _nodes[id];
+        }
+
+        public INode GetDiscreteElementNodeById(long id)
+        {
+            return _discreteElementNodes[id];
+        }
+
+        public IDiscreteElement GetDiscreteElementById(long id)
+        {
+            return _discreteElements[id];
         }
 
         public IElement GetElementById(long id)
@@ -47,7 +57,7 @@ namespace ippt.dem.mesh.repository
             var nodesList = GetElementById(id).GetVerticesId();
             for (var i = 0; i < nodesList.Count; i++)
             {
-                elementVerticies.Add(i,GetNodeById(nodesList[i]));
+                elementVerticies.Add(i,GetFiniteElementNodeById(nodesList[i]));
             }
             return elementVerticies;
         }
@@ -72,6 +82,16 @@ namespace ippt.dem.mesh.repository
             _discreteElements.Add(discreteElement.GetId(),discreteElement);
             _groupDiscreteElementIds[discreteElement.GetGroupId()].Add(discreteElement.GetId());
             _discreteElementNodes.Add(node.GetId(),node);
+        }
+
+        public string GetSphereNodeToString(long id, FileFormat format)
+        {
+            return _discreteElementNodes[id].ToString(format);
+        }
+
+        public string GetSphereElementToString(long id, FileFormat format)
+        {
+            return _discreteElements[id].ToString(format);
         }
 
         public Dictionary<long, List<long>> GetDiscreteElementGroup()

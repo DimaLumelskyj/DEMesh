@@ -1,4 +1,6 @@
-﻿using ippt.dem.mesh.entities.core;
+﻿using System;
+using ippt.dem.mesh.entities.core;
+using ippt.dem.mesh.repository;
 
 namespace ippt.dem.mesh.entities.discrete.element
 {
@@ -41,6 +43,19 @@ namespace ippt.dem.mesh.entities.discrete.element
         public int GetGroupId()
         {
             return _groupId;
+        }
+
+        public string ToString(FileFormat format)
+        {
+            switch (format)
+            {
+                case FileFormat.Dat:
+                    return $"            {_nodeId.ToString()} 1 {_radius.ToString()}";
+                case FileFormat.Msh:
+                    return $"            {_id.ToString()} {_nodeId.ToString()} {_radius.ToString()} 1";;
+                default:
+                    throw new Exception($"unknown file format: {format}");
+            }
         }
     }
 }
