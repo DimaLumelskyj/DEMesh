@@ -186,8 +186,7 @@ namespace ippt.dem.mesh.system.parser
 
             return 0;
         }
-
-      
+        
     }
 
     internal class Position
