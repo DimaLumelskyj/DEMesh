@@ -97,7 +97,8 @@ namespace ippt.dem.mesh.system.parser
                         _nodeCreator.FactoryMethod(
                             _dataRepository
                             .GetElementById(id)
-                            .GetCenterNodeInElement(_dataRepository.GetElementNodes(id),id)));
+                            .GetCenterNodeInElement(_dataRepository.GetElementNodes(id),id)),
+                        id);
                 }
                 catch (Exception e)
                 {

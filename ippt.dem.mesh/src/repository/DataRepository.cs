@@ -16,7 +16,7 @@ namespace ippt.dem.mesh.repository
         public Dictionary<long, INode> GetElementNodes(long id);
         public void AddElement(IElement element);
         public void InitializeGroupElementIds(List<int> groupsId);
-        public void AddSimpleSphere(IDiscreteElement discreteElement, INode node);
+        public void AddSimpleSphere(IDiscreteElement discreteElement, INode node, long finiteElementId);
         public string GetSphereNodeToString(long id, FileFormat format);
         public string GetSphereElementToString(long id, FileFormat format);
         public Dictionary<long, List<long>> GetDiscreteElementGroup();

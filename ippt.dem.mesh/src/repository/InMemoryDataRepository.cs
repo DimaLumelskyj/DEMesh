@@ -18,7 +18,9 @@ namespace ippt.dem.mesh.repository
         private readonly Dictionary<long, IDiscreteElement> _discreteElements;
         private readonly Dictionary<long, List<long>> _groupDiscreteElementIds;
         private readonly Dictionary<long,INode> _discreteElementNodes;
-
+        private readonly Dictionary<long, long> _discreteElementNodesRelatedToFe;
+        private readonly Dictionary<long, long> _feIdRelatedToDiscreteElementNodes;
+        
         private readonly ILogger _log;
         
         public InMemoryDataRepository(ILogger<InMemoryDataRepository> log)
@@ -30,6 +32,8 @@ namespace ippt.dem.mesh.repository
             _discreteElements = new Dictionary<long, IDiscreteElement>();
             _groupDiscreteElementIds = new Dictionary<long, List<long>>();
             _discreteElementNodes = new Dictionary<long, INode>();
+            _discreteElementNodesRelatedToFe = new Dictionary<long, long>();
+            _feIdRelatedToDiscreteElementNodes = new Dictionary<long, long>();
         }
         
         public void AddNode(INode node)
@@ -83,11 +87,13 @@ namespace ippt.dem.mesh.repository
             }
         }
 
-        public void AddSimpleSphere(IDiscreteElement discreteElement, INode node)
+        public void AddSimpleSphere(IDiscreteElement discreteElement, INode node, long finiteElementId)
         {
             _discreteElements.Add(discreteElement.GetId(),discreteElement);
             _groupDiscreteElementIds[discreteElement.GetGroupId()].Add(discreteElement.GetId());
             _discreteElementNodes.Add(node.GetId(),node);
+            _discreteElementNodesRelatedToFe.Add(node.GetId(), finiteElementId);
+            _feIdRelatedToDiscreteElementNodes.Add(finiteElementId,node.GetId());
         }
 
         public string GetSphereNodeToString(long id, FileFormat format)
@@ -115,13 +121,14 @@ namespace ippt.dem.mesh.repository
             return _elements.Values.ToList();
         }
 
+        //deprecated - very ineffective algorithm
         public void UpdateFiniteElementContactData()
         {
             long counter = 0;
             foreach (var element in _elements)
             {
                 counter++;
-                if (counter % 100 == 0)
+                if (counter % 1000 == 0)
                 {
                     _log.LogInformation("Searched to find contact n={applicationEvent} elements at {dateTime}", counter.ToString(), DateTime.UtcNow.ToString());
                 }
