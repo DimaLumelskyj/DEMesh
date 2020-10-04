@@ -23,6 +23,8 @@ namespace ippt.dem.mesh.repository
         public Dictionary<long, List<long>> GetFiniteElementGroup();
         public List<IElement> GetFiniteElements();
         public void UpdateFiniteElementContactData();
+        public Dictionary<long, INode> GetDiscreteElementNodes();
+        public long GetFiniteElementIdByDiscreteElementCenterNodeId(long discreteElementCenterNodeId);
     }
 
     public enum FileFormat

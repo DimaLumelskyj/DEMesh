@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ippt.dem.mesh.entities.core;
 using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
@@ -22,7 +23,7 @@ namespace ippt.dem.mesh.repository
         private readonly Dictionary<long, long> _feIdRelatedToDiscreteElementNodes;
         
         private readonly ILogger _log;
-        
+
         public InMemoryDataRepository(ILogger<InMemoryDataRepository> log)
         {
             _log = log;
@@ -124,6 +125,16 @@ namespace ippt.dem.mesh.repository
         public void UpdateFiniteElementContactData()
         {
             
+        }
+
+        public Dictionary<long, INode> GetDiscreteElementNodes()
+        {
+            return _discreteElementNodes;
+        }
+
+        public long GetFiniteElementIdByDiscreteElementCenterNodeId(long discreteElementCenterNodeId)
+        {
+            return _discreteElementNodesRelatedToFe[discreteElementCenterNodeId];
         }
     }
 }

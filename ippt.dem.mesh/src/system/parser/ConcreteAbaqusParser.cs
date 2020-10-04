@@ -54,7 +54,7 @@ namespace ippt.dem.mesh.system.parser
             }
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file ended", DateTime.UtcNow.ToString());
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact", DateTime.UtcNow.ToString());
-            _dataRepository.UpdateFiniteElementContactData();
+            ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact ended", DateTime.UtcNow.ToString());
         }
 

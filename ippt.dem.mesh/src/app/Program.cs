@@ -1,4 +1,5 @@
-﻿using ippt.dem.mesh.entities.discrete.element;
+﻿using ippt.dem.mesh.entities.core;
+using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
