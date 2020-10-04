@@ -120,20 +120,10 @@ namespace ippt.dem.mesh.repository
         {
             return _elements.Values.ToList();
         }
-
-        //deprecated - very ineffective algorithm
+        
         public void UpdateFiniteElementContactData()
         {
-            long counter = 0;
-            foreach (var element in _elements)
-            {
-                counter++;
-                if (counter % 1000 == 0)
-                {
-                    _log.LogInformation("Searched to find contact n={applicationEvent} elements at {dateTime}", counter.ToString(), DateTime.UtcNow.ToString());
-                }
-                element.Value.FindNeighbourElements();
-            }
+            
         }
     }
 }
