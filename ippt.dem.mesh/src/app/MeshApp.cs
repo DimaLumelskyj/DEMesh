@@ -28,8 +28,8 @@ namespace ippt.dem.mesh.app
         {
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "Started", DateTime.UtcNow.ToString());
             _abaqusParser.parse(_coreTextFileRead.ReadFromFile(path));
-            _log.LogInformation("Application {applicationEvent} at {dateTime}", "Ended", DateTime.UtcNow.ToString());
             _writeOutputResults.WriteOutput(path);
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "Ended", DateTime.UtcNow.ToString());
         }
     }
 }

@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
+using Microsoft.Extensions.Logging;
 
 namespace ippt.dem.mesh.repository
 {
@@ -15,9 +18,12 @@ namespace ippt.dem.mesh.repository
         private readonly Dictionary<long, IDiscreteElement> _discreteElements;
         private readonly Dictionary<long, List<long>> _groupDiscreteElementIds;
         private readonly Dictionary<long,INode> _discreteElementNodes;
+
+        private readonly ILogger _log;
         
-        public InMemoryDataRepository()
+        public InMemoryDataRepository(ILogger<InMemoryDataRepository> log)
         {
+            _log = log;
             _nodes = new Dictionary<long, INode>(); 
             _elements = new Dictionary<long, IElement>();
             _groupElementIds = new Dictionary<long, List<long>>();
@@ -97,6 +103,30 @@ namespace ippt.dem.mesh.repository
         public Dictionary<long, List<long>> GetDiscreteElementGroup()
         {
             return _groupDiscreteElementIds;
+        }
+
+        public Dictionary<long, List<long>> GetFiniteElementGroup()
+        {
+            return _groupElementIds;
+        }
+
+        public List<IElement> GetFiniteElements()
+        {
+            return _elements.Values.ToList();
+        }
+
+        public void UpdateFiniteElementContactData()
+        {
+            long counter = 0;
+            foreach (var element in _elements)
+            {
+                counter++;
+                if (counter % 100 == 0)
+                {
+                    _log.LogInformation("Searched to find contact n={applicationEvent} elements at {dateTime}", counter.ToString(), DateTime.UtcNow.ToString());
+                }
+                element.Value.FindNeighbourElements();
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
+using Microsoft.Extensions.Logging;
 
 namespace ippt.dem.mesh.system.parser
 {
@@ -21,6 +22,7 @@ namespace ippt.dem.mesh.system.parser
         private const int NumberOfElementsInHexahedronElementLineString = 9; // 8 vertices + 1 element id
         private const int NumberOfElementsInTetrahedronElementLineString = 5; // 4 vertices + 1 element id
        
+        private readonly ILogger _log;
         private readonly DataRepository _dataRepository;
         private readonly NodeCreator _nodeCreator;
         private readonly ElementCreator _elementCreator;
@@ -28,16 +30,20 @@ namespace ippt.dem.mesh.system.parser
 
         public ConcreteAbaqusParser(DataRepository dataRepository,
             NodeCreator nodeCreator,
-            ElementCreator elementCreator, DiscreteElementCreator discreteElementCreator)
+            ElementCreator elementCreator,
+            DiscreteElementCreator discreteElementCreator,
+            ILogger<ConcreteAbaqusParser> log)
         {
             _dataRepository = dataRepository;
             _nodeCreator = nodeCreator;
             _elementCreator = elementCreator;
             _discreteElementCreator = discreteElementCreator;
+            _log = log;
         }
 
         public void parse(List<string> data)
         {
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file", DateTime.UtcNow.ToString());
             Position nodesPosition = GetNodePositions(data);
             List<Position> elementsPositions = GetElementPositions(data);
             ParseNodes(data.GetRange(nodesPosition.GetBegin(),nodesPosition.GetRange()));
@@ -46,6 +52,10 @@ namespace ippt.dem.mesh.system.parser
             {
                 ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1), position.GetId());
             }
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file ended", DateTime.UtcNow.ToString());
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact", DateTime.UtcNow.ToString());
+            _dataRepository.UpdateFiniteElementContactData();
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact ended", DateTime.UtcNow.ToString());
         }
 
         private static List<int> GetGroupList(List<Position> positions)
@@ -91,7 +101,7 @@ namespace ippt.dem.mesh.system.parser
                 }
                 catch (Exception e)
                 {
-                    throw new InvalidDataException($"Wrong nodes data read: {line}");
+                    throw new InvalidDataException($"Wrong nodes data read: {line}" + e.Message);
                 }
             }
         }

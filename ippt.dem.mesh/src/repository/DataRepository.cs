@@ -19,8 +19,10 @@ namespace ippt.dem.mesh.repository
         public void AddSimpleSphere(IDiscreteElement discreteElement, INode node);
         public string GetSphereNodeToString(long id, FileFormat format);
         public string GetSphereElementToString(long id, FileFormat format);
-
         public Dictionary<long, List<long>> GetDiscreteElementGroup();
+        public Dictionary<long, List<long>> GetFiniteElementGroup();
+        public List<IElement> GetFiniteElements();
+        public void UpdateFiniteElementContactData();
     }
 
     public enum FileFormat

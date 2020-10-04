@@ -6,42 +6,33 @@ using ippt.dem.mesh.entities.core;
 using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
+using Microsoft.Extensions.Logging;
 
 namespace ippt.dem.mesh.entities.finite.element
 {
     public class HexahedronElement : IElement
     {
-        /*
-         element created from nodes:
-         1 2 3 4 5 6 7 8
-         6 surfaces: 
-         bottom: 1 2 3 4    -> _neighboursId[0]
-         top: 5 6 7 8       -> _neighboursId[1]      
-         XZ: 1 2 6 5        -> _neighboursId[2]
-         YZ: 2 3 7 6        -> _neighboursId[3]
-         MinusXZ : 4 3 7 8  -> _neighboursId[4]
-         MinusYZ : 1 4 8 5  -> _neighboursId[5]
-         https://abaqus-docs.mit.edu/2017/English/SIMACAEELMRefMap/simaelm-c-solidcont.htm
+         /*
+             element created from nodes:
+             1 2 3 4 5 6 7 8
+             6 surfaces: 
+             bottom: 1 2 3 4    -> _neighboursId[0]
+             top: 5 6 7 8       -> _neighboursId[1]      
+             XZ: 1 2 6 5        -> _neighboursId[2]
+             YZ: 2 3 7 6        -> _neighboursId[3]
+             MinusXZ : 4 3 7 8  -> _neighboursId[4]
+             MinusYZ : 1 4 8 5  -> _neighboursId[5]
+             https://abaqus-docs.mit.edu/2017/English/SIMACAEELMRefMap/simaelm-c-solidcont.htm
          */
-        
+
+        private Boolean _contactSearched = false;
+         
         private readonly long _id;
         
         private readonly List<long> _verticesId;
         
-        private readonly List<long> _neighboursId;
-        
-        private readonly List<long> _topSurface;
-        
-        private readonly List<long> _bottomSurface;
-        
-        private readonly List<long> _xzSurface;
-        
-        private readonly List<long> _yzSurface;
+        private Dictionary<PositionInQuadElement, long> _neighboursId;
 
-        private readonly List<long> _minusXzSurface;
-        
-        private readonly List<long> _minusYzSurface;
-        
         private const ElementType Type = ElementType.Hexahedron;
         
         private readonly int _groupId;
@@ -59,15 +50,74 @@ namespace ippt.dem.mesh.entities.finite.element
             _verticesId = elementDto.GetNodesId();
             _id = elementDto.GetId();
             _groupId = elementDto.GetGroupId();
-            _neighboursId = new List<long>{ 0, 0, 0, 0, 0 , 0 };
-            _topSurface = new List<long>{ _verticesId[4], _verticesId[5], _verticesId[6], _verticesId[7] };
-            _bottomSurface = new List<long>{ _verticesId[0], _verticesId[1], _verticesId[2], _verticesId[3] };
-            _xzSurface = new List<long>{  _verticesId[0], _verticesId[1], _verticesId[5], _verticesId[4] };
-            _yzSurface = new List<long>{  _verticesId[1], _verticesId[2], _verticesId[6], _verticesId[5] };
-            _minusXzSurface = new List<long>{  _verticesId[3], _verticesId[2], _verticesId[6], _verticesId[7] };
-            _minusYzSurface = new List<long>{  _verticesId[0], _verticesId[3], _verticesId[7], _verticesId[4] };
+
+            _neighboursId = new Dictionary<PositionInQuadElement, long>()
+            {
+                {PositionInQuadElement.Bottom, 0},
+                {PositionInQuadElement.Top, 0},
+                {PositionInQuadElement.XZ, 0},
+                {PositionInQuadElement.YZ, 0},
+                {PositionInQuadElement.MinusXZ, 0},
+                {PositionInQuadElement.MinusYZ, 0}
+            };
+        }
+
+        private QuadSurface GetSurface(PositionInQuadElement position, List<long> verticesId)
+        {
+            switch (position)
+            {
+                case PositionInQuadElement.Bottom:
+                    return GetBottom(verticesId);
+                case PositionInQuadElement.Top:
+                    return GetTop(verticesId);
+                case PositionInQuadElement.XZ:
+                    return GetXz(verticesId);
+                case PositionInQuadElement.YZ:
+                    return GetYz(verticesId);
+                case PositionInQuadElement.MinusXZ:
+                    return GetMinusXz(verticesId);
+                case PositionInQuadElement.MinusYZ:
+                    return GetMinusYz(verticesId);
+                default:
+                    throw new Exception("wrong position");
+            }
+        }
+        private QuadSurface GetBottom(List<long> verticesId)
+        {
+            return new QuadSurface(new List<long> {verticesId[0], verticesId[1], verticesId[2], verticesId[3]},
+                PositionInQuadElement.Bottom);
+        }
+
+        private QuadSurface GetTop(List<long> verticesId)
+        {
+            return new QuadSurface(new List<long> {verticesId[4], verticesId[5], verticesId[6], verticesId[7]},
+                PositionInQuadElement.Top);
+        }
+
+        private QuadSurface GetXz(List<long> verticesId)
+        {
+            return new QuadSurface(new List<long> {verticesId[0], verticesId[1], verticesId[5], verticesId[4]},
+                PositionInQuadElement.XZ);
         }
         
+        private QuadSurface GetYz(List<long> verticesId)
+        {
+            return new QuadSurface(new List<long> {verticesId[1], verticesId[2], verticesId[6], verticesId[5]},
+                PositionInQuadElement.YZ);
+        }
+        
+        private QuadSurface GetMinusXz(List<long> verticesId)
+        {
+            return new QuadSurface(new List<long> {verticesId[3], verticesId[2], verticesId[6], verticesId[7]},
+                PositionInQuadElement.MinusXZ);
+        }
+        
+        private QuadSurface GetMinusYz(List<long> verticesId)
+        {
+            return new QuadSurface(new List<long> {verticesId[0], verticesId[3], verticesId[7], verticesId[4]},
+                PositionInQuadElement.MinusYZ);
+        }
+
         public long GetId()
         {
             return _id;
@@ -138,7 +188,42 @@ namespace ippt.dem.mesh.entities.finite.element
 
         public void FindNeighbourElements()
         {
-            
+           FindContact(PositionInQuadElement.Bottom, PositionInQuadElement.Top);
+           FindContact(PositionInQuadElement.Top, PositionInQuadElement.Bottom);
+           FindContact(PositionInQuadElement.XZ, PositionInQuadElement.MinusXZ);
+           FindContact(PositionInQuadElement.YZ, PositionInQuadElement.MinusYZ);
+           FindContact(PositionInQuadElement.MinusXZ, PositionInQuadElement.XZ);
+           FindContact(PositionInQuadElement.MinusYZ, PositionInQuadElement.YZ);
+           
+            _contactSearched = true;
+        }
+
+        private void FindContact(PositionInQuadElement surface, PositionInQuadElement contactSurface)
+        {
+            foreach (var element in _dataRepository.GetFiniteElements())
+            {
+                if(_id == element.GetId())
+                    continue;
+                if (CheckContact(element, surface, contactSurface)) { break; }
+            }
+        }
+
+        private Boolean CheckContact(IElement elementInContact,
+            PositionInQuadElement surfacePosition,
+            PositionInQuadElement contactSurfacePosition)
+        {
+            if (elementInContact.GetType() != ElementType.Hexahedron)
+            {
+                throw new Exception("wrong element type");
+            }
+            QuadSurface surface = GetSurface(surfacePosition, _verticesId);
+            QuadSurface contactSurface = GetSurface(contactSurfacePosition, elementInContact.GetVerticesId());
+            if (surface.Equals(contactSurface))
+            {
+                _neighboursId[surfacePosition] = elementInContact.GetId();
+                return true;
+            }
+            return false;
         }
     }
 }
