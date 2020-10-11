@@ -4,9 +4,9 @@ namespace ippt.dem.mesh.entities.core
 {
     public static class ContactElementSearch
     {
-        private static DataRepository _data;
+        private static IDataRepository _data;
 
-        public static void ContactSearchOfHexaElements(DataRepository data)
+        public static void ContactSearchOfHexaElements(IDataRepository data)
         {
             _data = data;
             foreach (var node in _data.GetDiscreteElementNodes())

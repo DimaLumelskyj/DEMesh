@@ -4,3 +4,9 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 .idea
+/.vs/DEMesh/DesignTimeBuild/.dtbcache.v2
+/.vs/DEMesh/v16/.suo
+/DEMesh.sln.DotSettings.user
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json

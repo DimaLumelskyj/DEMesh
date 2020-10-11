@@ -9,11 +9,13 @@ using Microsoft.Extensions.Logging;
 
 namespace ippt.dem.mesh.repository
 {
-    public class InMemoryDataRepository : DataRepository
+    public class InMemoryDataRepository : IDataRepository
     {
     
         private readonly Dictionary<long,INode> _nodes;
+        private readonly Dictionary<long, HashSet<long>> _nodeNeighbourElements;
         private readonly Dictionary<long, IElement> _elements;
+        private readonly Dictionary<long, HashSet<long>> _elementNeighbourElements;
         private readonly Dictionary<long, List<long>> _groupElementIds;
         
         private readonly Dictionary<long, IDiscreteElement> _discreteElements;
@@ -21,20 +23,25 @@ namespace ippt.dem.mesh.repository
         private readonly Dictionary<long,INode> _discreteElementNodes;
         private readonly Dictionary<long, long> _discreteElementNodesRelatedToFe;
         private readonly Dictionary<long, long> _feIdRelatedToDiscreteElementNodes;
+
+        
         
         private readonly ILogger _log;
 
         public InMemoryDataRepository(ILogger<InMemoryDataRepository> log)
         {
             _log = log;
+            _nodeNeighbourElements = new Dictionary<long, HashSet<long>>();
             _nodes = new Dictionary<long, INode>(); 
             _elements = new Dictionary<long, IElement>();
+            _elementNeighbourElements = new Dictionary<long, HashSet<long>>();
             _groupElementIds = new Dictionary<long, List<long>>();
             _discreteElements = new Dictionary<long, IDiscreteElement>();
             _groupDiscreteElementIds = new Dictionary<long, List<long>>();
             _discreteElementNodes = new Dictionary<long, INode>();
             _discreteElementNodesRelatedToFe = new Dictionary<long, long>();
             _feIdRelatedToDiscreteElementNodes = new Dictionary<long, long>();
+            
         }
         
         public void AddNode(INode node)
@@ -77,6 +84,7 @@ namespace ippt.dem.mesh.repository
         {
             _elements.Add(element.GetId(),element);
             _groupElementIds[element.GetGroup()].Add(element.GetId());
+            element.GetVerticesId().ForEach(nodeId =>_nodeNeighbourElements[nodeId].Add(element.GetId()));
         }
 
         public void InitializeGroupElementIds(List<int> groupsId)
@@ -135,6 +143,32 @@ namespace ippt.dem.mesh.repository
         public long GetFiniteElementIdByDiscreteElementCenterNodeId(long discreteElementCenterNodeId)
         {
             return _discreteElementNodesRelatedToFe[discreteElementCenterNodeId];
+        }
+
+        public void InitNodeNeighbourElement()
+        {
+            foreach (var node in _nodes)
+            {
+                _nodeNeighbourElements.Add(node.Key, new HashSet<long>());
+            }
+        }
+        
+        public void SetElementNeighbourElement()
+        {
+            foreach (var element in _elements)
+            {
+                _elementNeighbourElements.Add(element.Key,GetNeighbourElementByVerticies(element.Key));
+            }
+        }
+
+        public HashSet<long> GetNeighbourElementByVerticies(long elementId)
+        {
+            var neighbourElementByVerticies = new HashSet<long>();
+            _elements[elementId]
+                .GetVerticesId()
+                .ForEach(nodeId => neighbourElementByVerticies.UnionWith(_nodeNeighbourElements[nodeId]));
+            neighbourElementByVerticies.Remove(elementId);
+            return neighbourElementByVerticies;
         }
     }
 }

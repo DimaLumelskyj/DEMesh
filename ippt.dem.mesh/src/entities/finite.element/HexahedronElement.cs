@@ -39,11 +39,11 @@ namespace ippt.dem.mesh.entities.finite.element
 
         private readonly DiscreteElementCreator _discreteElementCreator;
         
-        private readonly DataRepository _dataRepository;
+        private readonly IDataRepository _dataRepository;
 
         public HexahedronElement(ElementDto elementDto,
             DiscreteElementCreator discreteElementCreator,
-            DataRepository dataRepository)
+            IDataRepository dataRepository)
         {
             _discreteElementCreator = discreteElementCreator;
             _dataRepository = dataRepository;

@@ -6,7 +6,7 @@ using ippt.dem.mesh.entities.nodes;
 
 namespace ippt.dem.mesh.repository
 {
-    public interface DataRepository
+    public interface IDataRepository
     {
         public void AddNode(INode node);
         public INode GetFiniteElementNodeById(long id);
@@ -25,6 +25,8 @@ namespace ippt.dem.mesh.repository
         public void UpdateFiniteElementContactData();
         public Dictionary<long, INode> GetDiscreteElementNodes();
         public long GetFiniteElementIdByDiscreteElementCenterNodeId(long discreteElementCenterNodeId);
+        public void InitNodeNeighbourElement();
+        public void SetElementNeighbourElement();
     }
 
     public enum FileFormat

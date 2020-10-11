@@ -7,7 +7,7 @@ namespace ippt.dem.mesh.system.write
 {
     public class WriteOutputResults : IWriteOutputResults
     {
-        private readonly DataRepository _dataRepository;
+        private readonly IDataRepository _dataRepository;
         private string _fileName;
         private string _fileDirectory;
         private string _outputDatPath;
@@ -16,7 +16,7 @@ namespace ippt.dem.mesh.system.write
         private string _outputMshFileName;
         private readonly ILogger _log;
         
-        public WriteOutputResults(DataRepository dataRepository,
+        public WriteOutputResults(IDataRepository dataRepository,
             ILogger<WriteOutputResults> log)
         {
             _dataRepository = dataRepository;
@@ -118,7 +118,7 @@ namespace ippt.dem.mesh.system.write
             }
             catch(Exception e)
             {
-                Console.WriteLine("Exception: " + e.Message);
+                Console.WriteLine($"Exception: {e.Message}");
             }
             finally
             {

@@ -11,10 +11,10 @@ namespace ippt.dem.mesh.entities.finite.element
         private const int NumberOfVerticesInHexahedron = 8;
         private const int NumberOfVerticesInTetrahaedr = 4;
         private readonly DiscreteElementCreator _discreteElementCreator;
-        private readonly DataRepository _dataRepository;
+        private readonly IDataRepository _dataRepository;
 
         public ConcreteElementCreator(DiscreteElementCreator discreteElementCreator,
-            DataRepository dataRepository)
+            IDataRepository dataRepository)
         {
             _discreteElementCreator = discreteElementCreator;
             _dataRepository = dataRepository;

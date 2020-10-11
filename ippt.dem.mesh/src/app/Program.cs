@@ -39,7 +39,7 @@ namespace ippt.dem.mesh.app
                 builder.AddNLog("nlog.config");
             });
             services.AddSingleton<ICoreTextFileRead, CoreTextFileReadImpl>();
-            services.AddSingleton<DataRepository, InMemoryDataRepository>();
+            services.AddSingleton<IDataRepository, InMemoryDataRepository>();
             services.AddSingleton<IAbaqusParser, ConcreteAbaqusParser>();
             services.AddSingleton<NodeCreator,ConcreteNodeCreator>();
             services.AddSingleton<ElementCreator,ConcreteElementCreator>();

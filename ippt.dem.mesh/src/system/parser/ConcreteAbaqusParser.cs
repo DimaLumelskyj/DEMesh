@@ -23,12 +23,12 @@ namespace ippt.dem.mesh.system.parser
         private const int NumberOfElementsInTetrahedronElementLineString = 5; // 4 vertices + 1 element id
        
         private readonly ILogger _log;
-        private readonly DataRepository _dataRepository;
+        private readonly IDataRepository _dataRepository;
         private readonly NodeCreator _nodeCreator;
         private readonly ElementCreator _elementCreator;
         private readonly DiscreteElementCreator _discreteElementCreator;
 
-        public ConcreteAbaqusParser(DataRepository dataRepository,
+        public ConcreteAbaqusParser(IDataRepository dataRepository,
             NodeCreator nodeCreator,
             ElementCreator elementCreator,
             DiscreteElementCreator discreteElementCreator,
@@ -48,13 +48,15 @@ namespace ippt.dem.mesh.system.parser
             List<Position> elementsPositions = GetElementPositions(data);
             ParseNodes(data.GetRange(nodesPosition.GetBegin(),nodesPosition.GetRange()));
             _dataRepository.InitializeGroupElementIds(GetGroupList(elementsPositions));
+            _dataRepository.InitNodeNeighbourElement();
             foreach (var position in elementsPositions)
             {
                 ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1), position.GetId());
             }
+           //_dataRepository.SetElementNeighbourElement();
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file ended", DateTime.UtcNow.ToString());
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact", DateTime.UtcNow.ToString());
-            ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
+           //ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact ended", DateTime.UtcNow.ToString());
         }
 
