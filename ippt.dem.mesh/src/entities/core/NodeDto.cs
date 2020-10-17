@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using ippt.dem.mesh.entities.nodes;
 
 namespace ippt.dem.mesh.entities.core
 {

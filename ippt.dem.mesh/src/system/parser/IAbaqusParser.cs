@@ -5,6 +5,6 @@ namespace ippt.dem.mesh.system.parser
 {
     public interface IAbaqusParser
     {
-        public void parse(List<string> data);
+        public void Parse(List<string> data);
     }
 }

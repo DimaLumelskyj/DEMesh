@@ -41,7 +41,7 @@ namespace ippt.dem.mesh.system.parser
             _log = log;
         }
 
-        public void parse(List<string> data)
+        public void Parse(List<string> data)
         {
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file", DateTime.UtcNow.ToString());
             Position nodesPosition = GetNodePositions(data);
@@ -53,7 +53,9 @@ namespace ippt.dem.mesh.system.parser
             {
                 ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1), position.GetId());
             }
-           //_dataRepository.SetElementNeighbourElement();
+
+            _dataRepository.LogVolumeInformation();
+            //_dataRepository.SetElementNeighbourElement();
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file ended", DateTime.UtcNow.ToString());
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact", DateTime.UtcNow.ToString());
            //ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
@@ -72,35 +74,26 @@ namespace ippt.dem.mesh.system.parser
 
         private void ParseElementsSet(List<string> elements, int group)
         {
-            var verticiesID = new List<long>();
             foreach (var line in elements)
             {
-                verticiesID.Clear();
                 try
                 {
-                    var elementData = line.Split(',').ToList();
-                    bool a = elementData.Count == NumberOfElementsInHexahedronElementLineString && elementData.Count == NumberOfElementsInTetrahedronElementLineString;
-                    if (a)
+                    var elementData = Array.ConvertAll(line.Split(','), s => long.Parse(s)).ToList();
+                    /*if (elementData.Count == NumberOfElementsInHexahedronElementLineString &&
+                        elementData.Count == NumberOfElementsInTetrahedronElementLineString)
                     {
-                        throw new InvalidDataException($"Wrong elements data read: {line}");
-                    }
+                        throw new InvalidDataException($"Wrong elements data read");
+                    }*/
 
-                    var id = long.Parse(elementData[0]);
-                    for (var i = 1; i < elementData.Capacity; i++)
-                    {
-                        verticiesID.Add(long.Parse(elementData[i]));
-                    }
-                    
-                    _dataRepository.AddElement(_elementCreator.FactoryMethod(ElementDto.Get(id,new List<long>(verticiesID),group)));
-                    _dataRepository.AddSimpleSphere(
-                        _dataRepository
-                            .GetElementById(id)
-                            .GetSimpleFilledSphereDiscreteElement(_dataRepository.GetElementNodes(id),id,group),
-                        _nodeCreator.FactoryMethod(
-                            _dataRepository
-                            .GetElementById(id)
-                            .GetCenterNodeInElement(_dataRepository.GetElementNodes(id),id)),
-                        id);
+                    _dataRepository.AddElement(_elementCreator.FactoryMethod(ElementDto.Get(elementData[0],
+                        new List<long>( elementData.GetRange(1, 8)),group)));
+                    _dataRepository.AddSimpleSphere(_dataRepository
+                            .GetElementById(elementData[0])
+                            .GetSimpleFilledSphereDiscreteElement(_dataRepository.GetElementNodes(elementData[0]),elementData[0],group),
+                        _nodeCreator.FactoryMethod(_dataRepository
+                            .GetElementById(elementData[0])
+                            .GetCenterNodeInElement(_dataRepository.GetElementNodes(elementData[0]),elementData[0])),
+                        elementData[0]);
                 }
                 catch (Exception e)
                 {

@@ -18,14 +18,15 @@ namespace ippt.dem.mesh.app
         {
             
             string path = @"C:\Users\dimal\RiderProjects\DEMesh\ippt.dem.mesh\bin\Debug\netcoreapp3.1\1_50.inp";
-            
+            string reMeshDataPath = @"C:\Users\dimal\Desktop\RemeshData_1_50.txt";
+
             var services = new ServiceCollection();
             ConfigureServices(services);
 
             using (var serviceProvider = services.BuildServiceProvider())
             {
                 var app = serviceProvider.GetService<MeshApp>();
-                app?.Run(path);
+                app?.Run(path, reMeshDataPath);
             }
         }
 
@@ -45,6 +46,8 @@ namespace ippt.dem.mesh.app
             services.AddSingleton<ElementCreator,ConcreteElementCreator>();
             services.AddSingleton<DiscreteElementCreator, ConcreteDiscreteElementCreator>();
             services.AddSingleton<IWriteOutputResults, WriteOutputResults>();
+            services.AddSingleton<IComaSeparatedDataParser, ComaSeparatedDataParser>();
+            services.AddSingleton<ReMeshDiscreteElement>();
         }
     }
 }

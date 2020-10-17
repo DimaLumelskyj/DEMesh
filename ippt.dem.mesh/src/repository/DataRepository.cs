@@ -27,6 +27,9 @@ namespace ippt.dem.mesh.repository
         public long GetFiniteElementIdByDiscreteElementCenterNodeId(long discreteElementCenterNodeId);
         public void InitNodeNeighbourElement();
         public void SetElementNeighbourElement();
+        public void LogVolumeInformation();
+        public void CleanUpFiniteElementDataInformation();
+        void AddReMeshInputData(long numberOfParticles, double particleRadius);
     }
 
     public enum FileFormat

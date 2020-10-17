@@ -49,30 +49,30 @@ namespace ippt.dem.mesh.system.write
              }
         }
 
-        private void writeNodeDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
+        private void WriteNodeDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
         {
             streamWriter.WriteLine(_dataRepository.GetSphereNodeToString(
                 _dataRepository.GetDiscreteElementById(id).GetCenterNodeId(),
                 format));
         }
         
-        private void writeDiscreteElementSphereDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
+        private void WriteDiscreteElementSphereDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
         {
             streamWriter.WriteLine(_dataRepository.GetSphereElementToString(
                 _dataRepository.GetDiscreteElementById(id).GetCenterNodeId(),
                 format));
         }
         
-        private void writeMshFile(StreamWriter  mshStreamWriter)
+        private void WriteMshFile(StreamWriter  mshStreamWriter)
         {
-            foreach (var group in _dataRepository.GetDiscreteElementGroup())
+            foreach (var (groupId, elements) in _dataRepository.GetDiscreteElementGroup())
             {
-                mshStreamWriter.WriteLine($"MESH \"Group_{group.Key.ToString()}\" dimension = 3 ElemType Sphere        Nnode =  1");
+                mshStreamWriter.WriteLine($"MESH \"Group_{groupId.ToString()}\" dimension = 3 ElemType Sphere        Nnode =  1");
                 mshStreamWriter.WriteLine("Coordinates");
-                group.Value.ForEach(id => writeNodeDataInGroup(mshStreamWriter, id, FileFormat.Msh));
+                elements.ForEach(id => WriteNodeDataInGroup(mshStreamWriter, id, FileFormat.Msh));
                 mshStreamWriter.WriteLine("End coordinates");
                 mshStreamWriter.WriteLine("Elements");
-                group.Value.ForEach(id => writeDiscreteElementSphereDataInGroup(mshStreamWriter, id, FileFormat.Msh));
+                elements.ForEach(id => WriteDiscreteElementSphereDataInGroup(mshStreamWriter, id, FileFormat.Msh));
                 mshStreamWriter.WriteLine("End Elements");
             }
         }
@@ -82,11 +82,11 @@ namespace ippt.dem.mesh.system.write
             datStreamWriter.WriteLine("GEOMETRY_DEFINITION");
             datStreamWriter.WriteLine("        GENERAL:    GSCALE =  1.0");
             
-            foreach (var group in _dataRepository.GetDiscreteElementGroup())
+            foreach (var (key, value) in _dataRepository.GetDiscreteElementGroup())
             {
-                datStreamWriter.WriteLine($"        SET Group_{group.Key.ToString()}");
-                group.Value.ForEach(id => writeNodeDataInGroup(datStreamWriter, id, FileFormat.Dat));
-                datStreamWriter.WriteLine($"        END_SET Group_{group.Key.ToString()}");
+                datStreamWriter.WriteLine($"        SET Group_{key.ToString()}");
+                value.ForEach(id => WriteNodeDataInGroup(datStreamWriter, id, FileFormat.Dat));
+                datStreamWriter.WriteLine($"        END_SET Group_{key.ToString()}");
             }
             datStreamWriter.WriteLine("END_GEOMETRY_DEFINITION");
             datStreamWriter.WriteLine("$-----------------------------------------------------------------------------");
@@ -97,7 +97,7 @@ namespace ippt.dem.mesh.system.write
                 datStreamWriter.WriteLine($"$");
                 datStreamWriter.WriteLine($"ELS_NAME= Group_{group.Key.ToString()}    ELM_TYPE: DISTINCT");
                 datStreamWriter.WriteLine("        CTOL=0.5E-06 SCALE=1.0 RISCAL=10.0");
-                group.Value.ForEach(id => writeDiscreteElementSphereDataInGroup(datStreamWriter, id, FileFormat.Dat));
+                group.Value.ForEach(id => WriteDiscreteElementSphereDataInGroup(datStreamWriter, id, FileFormat.Dat));
                 datStreamWriter.WriteLine($"    END_ELEMENT_DEFINITION");
                 datStreamWriter.WriteLine($"$");
                 datStreamWriter.WriteLine($"END_SET_DEFINITION");
@@ -110,7 +110,7 @@ namespace ippt.dem.mesh.system.write
                 StreamWriter mshStreamWriter = new StreamWriter(_outputMshPath);
                 StreamWriter datStreamWriter = new StreamWriter(_outputDatPath);
 
-                writeMshFile(mshStreamWriter);
+                WriteMshFile(mshStreamWriter);
                 writeDatFile(datStreamWriter);
 
                 mshStreamWriter.Close();

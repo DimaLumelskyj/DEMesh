@@ -72,11 +72,8 @@ namespace ippt.dem.mesh.repository
         public Dictionary<long, INode> GetElementNodes(long id)
         {
             var elementVerticies = new Dictionary<long, INode>();
-            var nodesList = GetElementById(id).GetVerticesId();
-            for (var i = 0; i < nodesList.Count; i++)
-            {
-                elementVerticies.Add(i,GetFiniteElementNodeById(nodesList[i]));
-            }
+            int i = 0;
+            _elements[id].GetVerticesId().ForEach(verticeId => elementVerticies.Add(i++, _nodes[verticeId]));
             return elementVerticies;
         }
 
@@ -159,6 +156,32 @@ namespace ippt.dem.mesh.repository
             {
                 _elementNeighbourElements.Add(element.Key,GetNeighbourElementByVerticies(element.Key));
             }
+        }
+
+        public void LogVolumeInformation()
+        {
+            foreach (var (groupId, elements) in _groupElementIds)
+            {
+                var V_element = _elements[elements[1]].GetVolume();
+                var V_total = elements.Count * V_element;
+                _log.LogInformation("Application: {applicationEvent} at {dateTime}",
+                    $"Group Id:{groupId.ToString()} N_of_elements={elements.Count.ToString()} V_element={V_element.ToString()} V_group={V_total.ToString()}",
+                    DateTime.UtcNow.ToString());
+            }
+        }
+
+        public void CleanUpFiniteElementDataInformation()
+        {
+            _nodes.Clear();
+            _nodeNeighbourElements.Clear();
+            _elements.Clear();
+            _elementNeighbourElements.Clear();
+            _groupElementIds.Clear();
+        }
+
+        public void AddReMeshInputData(long numberOfParticles, double particleRadius)
+        {
+            
         }
 
         public HashSet<long> GetNeighbourElementByVerticies(long elementId)

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace ippt.dem.mesh.entities.finite.element
+namespace ippt.dem.mesh.entities.core
 {
     public enum SurfaceName
     {
@@ -24,40 +24,39 @@ namespace ippt.dem.mesh.entities.finite.element
     {
         Bottom,
         Top,
-        XZ,
-        YZ,
-        MinusXZ,
-        MinusYZ
+        Xz,
+        Yz,
+        MinusXz,
+        MinusYz
     }
     
     public abstract class AbstractSurface
     {
-        private List<long> _nodeIds;
-        private SurfaceName _surfaceName;
-        
         protected AbstractSurface(List<long> nodeIds, SurfaceName surfaceName)
         {
-            this._nodeIds = nodeIds;
-            _surfaceName = surfaceName;
+            this.NodeIds = nodeIds;
         }
 
-        public List<long> NodeIds => _nodeIds;
+        public List<long> NodeIds { get; }
 
-        public SurfaceName SurfaceName => _surfaceName;
-        
         public override bool Equals(object? obj)
         {
             var other = obj as AbstractSurface;
 
             if (other == null)
                 return false;
-            var result = _nodeIds.SequenceEqual(other._nodeIds);
+            var result = NodeIds.SequenceEqual(other.NodeIds);
             return result;
+        }
+
+        protected bool Equals(AbstractSurface other)
+        {
+            return Equals(NodeIds, other.NodeIds);
         }
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (NodeIds != null ? NodeIds.GetHashCode() : 0);
         }
     }
 

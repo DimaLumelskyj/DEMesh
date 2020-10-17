@@ -7,6 +7,7 @@ using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
 using Microsoft.Extensions.Logging;
+using Vector = ippt.dem.mesh.entities.core.Vector;
 
 namespace ippt.dem.mesh.entities.finite.element
 {
@@ -55,10 +56,10 @@ namespace ippt.dem.mesh.entities.finite.element
             {
                 {PositionInQuadElement.Bottom, 0},
                 {PositionInQuadElement.Top, 0},
-                {PositionInQuadElement.XZ, 0},
-                {PositionInQuadElement.YZ, 0},
-                {PositionInQuadElement.MinusXZ, 0},
-                {PositionInQuadElement.MinusYZ, 0}
+                {PositionInQuadElement.Xz, 0},
+                {PositionInQuadElement.Yz, 0},
+                {PositionInQuadElement.MinusXz, 0},
+                {PositionInQuadElement.MinusYz, 0}
             };
         }
 
@@ -70,13 +71,13 @@ namespace ippt.dem.mesh.entities.finite.element
                     return GetBottom(verticesId);
                 case PositionInQuadElement.Top:
                     return GetTop(verticesId);
-                case PositionInQuadElement.XZ:
+                case PositionInQuadElement.Xz:
                     return GetXz(verticesId);
-                case PositionInQuadElement.YZ:
+                case PositionInQuadElement.Yz:
                     return GetYz(verticesId);
-                case PositionInQuadElement.MinusXZ:
+                case PositionInQuadElement.MinusXz:
                     return GetMinusXz(verticesId);
-                case PositionInQuadElement.MinusYZ:
+                case PositionInQuadElement.MinusYz:
                     return GetMinusYz(verticesId);
                 default:
                     throw new Exception("wrong position");
@@ -97,25 +98,25 @@ namespace ippt.dem.mesh.entities.finite.element
         private QuadSurface GetXz(List<long> verticesId)
         {
             return new QuadSurface(new List<long> {verticesId[0], verticesId[1], verticesId[5], verticesId[4]},
-                PositionInQuadElement.XZ);
+                PositionInQuadElement.Xz);
         }
         
         private QuadSurface GetYz(List<long> verticesId)
         {
             return new QuadSurface(new List<long> {verticesId[1], verticesId[2], verticesId[6], verticesId[5]},
-                PositionInQuadElement.YZ);
+                PositionInQuadElement.Yz);
         }
         
         private QuadSurface GetMinusXz(List<long> verticesId)
         {
             return new QuadSurface(new List<long> {verticesId[3], verticesId[2], verticesId[6], verticesId[7]},
-                PositionInQuadElement.MinusXZ);
+                PositionInQuadElement.MinusXz);
         }
         
         private QuadSurface GetMinusYz(List<long> verticesId)
         {
             return new QuadSurface(new List<long> {verticesId[0], verticesId[3], verticesId[7], verticesId[4]},
-                PositionInQuadElement.MinusYZ);
+                PositionInQuadElement.MinusYz);
         }
 
         public long GetId()
@@ -190,12 +191,18 @@ namespace ippt.dem.mesh.entities.finite.element
         {
            FindContact(PositionInQuadElement.Bottom, PositionInQuadElement.Top);
            FindContact(PositionInQuadElement.Top, PositionInQuadElement.Bottom);
-           FindContact(PositionInQuadElement.XZ, PositionInQuadElement.MinusXZ);
-           FindContact(PositionInQuadElement.YZ, PositionInQuadElement.MinusYZ);
-           FindContact(PositionInQuadElement.MinusXZ, PositionInQuadElement.XZ);
-           FindContact(PositionInQuadElement.MinusYZ, PositionInQuadElement.YZ);
+           FindContact(PositionInQuadElement.Xz, PositionInQuadElement.MinusXz);
+           FindContact(PositionInQuadElement.Yz, PositionInQuadElement.MinusYz);
+           FindContact(PositionInQuadElement.MinusXz, PositionInQuadElement.Xz);
+           FindContact(PositionInQuadElement.MinusYz, PositionInQuadElement.Yz);
            
             _contactSearched = true;
+        }
+
+        public double  GetVolume()
+        {
+            var nodes = _dataRepository.GetElementNodes(_id);
+            return Math.Pow(Vector.Length(nodes[0], nodes[1]), 3);
         }
 
         private void FindContact(PositionInQuadElement surface, PositionInQuadElement contactSurface)

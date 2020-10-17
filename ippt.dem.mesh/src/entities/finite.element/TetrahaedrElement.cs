@@ -56,5 +56,10 @@ namespace ippt.dem.mesh.entities.finite.element
         {
             throw new System.NotImplementedException();
         }
+
+        public double GetVolume()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
