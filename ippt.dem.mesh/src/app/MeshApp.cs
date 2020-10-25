@@ -26,7 +26,9 @@ namespace ippt.dem.mesh.app
         public MeshApp(ILogger<MeshApp> log,
             ICoreTextFileRead coreTextFileRead,
             IAbaqusParser abaqusParser,
-            IWriteOutputResults writeOutputResults, ReMeshDiscreteElement reMeshDiscreteElement, IComaSeparatedDataParser comaSeparatedDataParser)
+            IWriteOutputResults writeOutputResults,
+            ReMeshDiscreteElement reMeshDiscreteElement,
+            IComaSeparatedDataParser comaSeparatedDataParser)
         {
             this._log = log;
             this._coreTextFileRead = coreTextFileRead;
@@ -36,22 +38,28 @@ namespace ippt.dem.mesh.app
             _comaSeparatedDataParser = comaSeparatedDataParser;
         }
 
-        internal void Run(string path, string reMeshDataPath)
+        internal void Run(string path,
+            string reMeshDataPath,
+            DemMeshProcessCase mesherCase)
         {
             
-            _log.LogInformation("Application {applicationEvent} at {dateTime}", "Started", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
+            _log.LogInformation("Application {applicationEvent} at {dateTime}",
+                "Started",
+                DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
             _abaqusParser.Parse(_coreTextFileRead.ReadFromFile(path));
-            var processDataCase = StoreReMeshedDemMesh;
-            switch (processDataCase)
+            switch (mesherCase)
             {
                 case StoreRawDemMesh:
                     _writeOutputResults.WriteOutput(path);
                     break;
                 case StoreReMeshedDemMesh:
                     _comaSeparatedDataParser.ParseReMeshData(_coreTextFileRead.ReadFromFile(reMeshDataPath));
+                    _reMeshDiscreteElement.Run();
                     break;
             }
-            _log.LogInformation("Application {applicationEvent} at {dateTime}", "Ended", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
+            _log.LogInformation("Application {applicationEvent} at {dateTime}",
+                "Ended",
+                DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
         }
     }
 }

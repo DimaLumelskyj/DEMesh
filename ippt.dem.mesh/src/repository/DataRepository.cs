@@ -9,8 +9,6 @@ namespace ippt.dem.mesh.repository
     public interface IDataRepository
     {
         public void AddNode(INode node);
-        public INode GetFiniteElementNodeById(long id);
-        public INode GetDiscreteElementNodeById(long id);
         public IDiscreteElement GetDiscreteElementById(long id);
         public IElement GetElementById(long id);
         public Dictionary<long, INode> GetElementNodes(long id);
@@ -20,16 +18,17 @@ namespace ippt.dem.mesh.repository
         public string GetSphereNodeToString(long id, FileFormat format);
         public string GetSphereElementToString(long id, FileFormat format);
         public Dictionary<long, List<long>> GetDiscreteElementGroup();
-        public Dictionary<long, List<long>> GetFiniteElementGroup();
         public List<IElement> GetFiniteElements();
-        public void UpdateFiniteElementContactData();
         public Dictionary<long, INode> GetDiscreteElementNodes();
         public long GetFiniteElementIdByDiscreteElementCenterNodeId(long discreteElementCenterNodeId);
         public void InitNodeNeighbourElement();
-        public void SetElementNeighbourElement();
         public void LogVolumeInformation();
         public void CleanUpFiniteElementDataInformation();
-        void AddReMeshInputData(long numberOfParticles, double particleRadius);
+        public void AddReMeshInputData(long numberOfParticles, double particleRadius);
+        public Dictionary<double, long> GetRemeshProperties();
+        public List<long> GetDiscreteElementGroup(long groupId);
+        INode GetDiscreteElementNode(long getCenterNodeId);
+        public Dictionary<long, IDiscreteElement> GetDiscreteElements();
     }
 
     public enum FileFormat

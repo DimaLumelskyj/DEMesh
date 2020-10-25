@@ -19,13 +19,26 @@ namespace ippt.dem.mesh.entities.discrete.element
             _radius = elementDto.Radius;
             _id = elementDto.Id;
         }
+        
+        public DiscreteSphereElement(IDiscreteElement element)
+        {
+            _groupId = element.GetGroupId();
+            _nodeId = element.GetId();
+            _radius = element.GetRadius();
+            _id = element.GetId();
+        }
+
+        public static DiscreteSphereElement Get(IDiscreteElement element)
+        {
+            return new DiscreteSphereElement(element);
+        }
 
         public long GetId()
         {
             return _id;
         }
 
-        public ElementType GetType()
+        public new ElementType GetType()
         {
             return Type;
         }

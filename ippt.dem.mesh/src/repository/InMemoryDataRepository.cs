@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ippt.dem.mesh.entities.core;
 using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.entities.finite.element;
 using ippt.dem.mesh.entities.nodes;
@@ -23,7 +22,7 @@ namespace ippt.dem.mesh.repository
         private readonly Dictionary<long,INode> _discreteElementNodes;
         private readonly Dictionary<long, long> _discreteElementNodesRelatedToFe;
         private readonly Dictionary<long, long> _feIdRelatedToDiscreteElementNodes;
-
+        private readonly Dictionary<double, long> _remeshProperties;
         
         
         private readonly ILogger _log;
@@ -31,6 +30,7 @@ namespace ippt.dem.mesh.repository
         public InMemoryDataRepository(ILogger<InMemoryDataRepository> log)
         {
             _log = log;
+            _remeshProperties = new Dictionary<double, long>();
             _nodeNeighbourElements = new Dictionary<long, HashSet<long>>();
             _nodes = new Dictionary<long, INode>(); 
             _elements = new Dictionary<long, IElement>();
@@ -49,19 +49,9 @@ namespace ippt.dem.mesh.repository
             _nodes.Add(node.GetId(),node);
         }
 
-        public INode GetFiniteElementNodeById(long id)
-        {
-            return _nodes[id];
-        }
-
-        public INode GetDiscreteElementNodeById(long id)
-        {
-            return _discreteElementNodes[id];
-        }
-
         public IDiscreteElement GetDiscreteElementById(long id)
         {
-            return _discreteElements[id];
+            return  DiscreteSphereElement.Get(_discreteElements[id]);
         }
 
         public IElement GetElementById(long id)
@@ -117,19 +107,9 @@ namespace ippt.dem.mesh.repository
             return _groupDiscreteElementIds;
         }
 
-        public Dictionary<long, List<long>> GetFiniteElementGroup()
-        {
-            return _groupElementIds;
-        }
-
         public List<IElement> GetFiniteElements()
         {
             return _elements.Values.ToList();
-        }
-        
-        public void UpdateFiniteElementContactData()
-        {
-            
         }
 
         public Dictionary<long, INode> GetDiscreteElementNodes()
@@ -147,14 +127,6 @@ namespace ippt.dem.mesh.repository
             foreach (var node in _nodes)
             {
                 _nodeNeighbourElements.Add(node.Key, new HashSet<long>());
-            }
-        }
-        
-        public void SetElementNeighbourElement()
-        {
-            foreach (var element in _elements)
-            {
-                _elementNeighbourElements.Add(element.Key,GetNeighbourElementByVerticies(element.Key));
             }
         }
 
@@ -181,17 +153,27 @@ namespace ippt.dem.mesh.repository
 
         public void AddReMeshInputData(long numberOfParticles, double particleRadius)
         {
-            
+            _remeshProperties.Add(particleRadius, numberOfParticles);
         }
 
-        public HashSet<long> GetNeighbourElementByVerticies(long elementId)
+        public Dictionary<double, long> GetRemeshProperties()
         {
-            var neighbourElementByVerticies = new HashSet<long>();
-            _elements[elementId]
-                .GetVerticesId()
-                .ForEach(nodeId => neighbourElementByVerticies.UnionWith(_nodeNeighbourElements[nodeId]));
-            neighbourElementByVerticies.Remove(elementId);
-            return neighbourElementByVerticies;
+            return _remeshProperties;
+        }
+        
+        public List<long> GetDiscreteElementGroup(long groupId)
+        {
+            return _groupDiscreteElementIds[groupId];
+        }
+
+        public INode GetDiscreteElementNode(long centerNodeId)
+        {
+            return _discreteElementNodes[centerNodeId];
+        }
+
+        public Dictionary<long, IDiscreteElement> GetDiscreteElements()
+        {
+            return _discreteElements;
         }
     }
 }

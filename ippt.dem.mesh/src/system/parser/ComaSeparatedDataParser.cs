@@ -13,7 +13,7 @@ namespace ippt.dem.mesh.system.parser
         private readonly IDataRepository _dataRepository;
         private readonly ILogger _log;
      
-        public ComaSeparatedDataParser(ILogger log, IDataRepository dataRepository)
+        public ComaSeparatedDataParser(ILogger<ComaSeparatedDataParser> log, IDataRepository dataRepository)
         {
             _log = log;
             _dataRepository = dataRepository;

@@ -26,7 +26,7 @@ namespace ippt.dem.mesh.app
             using (var serviceProvider = services.BuildServiceProvider())
             {
                 var app = serviceProvider.GetService<MeshApp>();
-                app?.Run(path, reMeshDataPath);
+                app?.Run(path, reMeshDataPath, DemMeshProcessCase.StoreReMeshedDemMesh);
             }
         }
 
