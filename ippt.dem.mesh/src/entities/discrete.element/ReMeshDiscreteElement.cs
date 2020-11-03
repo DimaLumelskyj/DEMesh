@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ippt.dem.mesh.entities.nodes;
 using ippt.dem.mesh.repository;
 using Microsoft.Extensions.Logging;
@@ -32,8 +33,9 @@ namespace ippt.dem.mesh.entities.discrete.element
         {
             int groupId = 2;
             DataSetup(groupId);
-            GetRemeshRadiusSorted()
-                .ForEach(r => UpdateMesh(r, _properties[r]));
+            //GetRemeshRadiusSorted()
+            //    .ForEach(r => UpdateMesh(r, _properties[r]));
+            Parallel.ForEach(GetRemeshRadiusSorted(), r => UpdateMesh(r, _properties[r]));
         }
 
         private void DataSetup(int groupId)
@@ -156,32 +158,36 @@ namespace ippt.dem.mesh.entities.discrete.element
 
         private void SearchMaxRadiusPossible(long nodeId, List<double> coordinates, double radius)
         {
+            if (_nodeIdWhereRadiusPossible[radius].Count > 100)
+                return;
+            
             var nodesWithSameXyAndZGreaterThanRange
                 = filterZGreaterThanRange(filterXYNodes(coordinates[0], coordinates[1]), radius, coordinates[2]);
             INode nodeZPlus =
-                nodesWithSameXyAndZGreaterThanRange.DefaultIfEmpty().First(node => node.GetCoordinates()[2] > coordinates[2]);
+                nodesWithSameXyAndZGreaterThanRange.FirstOrDefault(node => node.GetCoordinates()[2] > coordinates[2]);
             INode nodeZMinus =
-                nodesWithSameXyAndZGreaterThanRange.First(node => node.GetCoordinates()[2] < coordinates[2]);
+                nodesWithSameXyAndZGreaterThanRange.FirstOrDefault(node => node.GetCoordinates()[2] < coordinates[2]);
             if (nodeZPlus == null || nodeZMinus == null)
                 return;
 
             var nodesWithSameXzAndYGreaterThanRange
                 = filterYGreaterThanRange(filterXZNodes(coordinates[0], coordinates[2]), radius, coordinates[1]);
             INode nodeYPlus =
-                nodesWithSameXzAndYGreaterThanRange.First(node => node.GetCoordinates()[1] > coordinates[1]);
+                nodesWithSameXzAndYGreaterThanRange.FirstOrDefault(node => node.GetCoordinates()[1] > coordinates[1]);
             INode nodeYMinus =
-                nodesWithSameXzAndYGreaterThanRange.First(node => node.GetCoordinates()[1] < coordinates[1]);
+                nodesWithSameXzAndYGreaterThanRange.FirstOrDefault(node => node.GetCoordinates()[1] < coordinates[1]);
             if (nodeYPlus == null || nodeYMinus == null)
                 return;
 
             var nodesWithSameYzAndXGreaterThanRange
                 = filterXGreaterThanRange(filterYZNodes(coordinates[1], coordinates[2]), radius, coordinates[0]);
             INode nodeXPlus =
-                nodesWithSameYzAndXGreaterThanRange.First(node => node.GetCoordinates()[0] > coordinates[0]);
+                nodesWithSameYzAndXGreaterThanRange.FirstOrDefault(node => node.GetCoordinates()[0] > coordinates[0]);
             INode nodeXMinus =
-                nodesWithSameYzAndXGreaterThanRange.First(node => node.GetCoordinates()[0] < coordinates[0]);
+                nodesWithSameYzAndXGreaterThanRange.FirstOrDefault(node => node.GetCoordinates()[0] < coordinates[0]);
             if (nodeXPlus == null || nodeXMinus == null)
                 return;
+            
             _nodeIdWhereRadiusPossible[radius].Add(nodeId);
         }
     }
