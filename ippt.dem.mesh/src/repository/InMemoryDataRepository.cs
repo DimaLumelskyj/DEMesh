@@ -166,6 +166,11 @@ namespace ippt.dem.mesh.repository
             return _groupDiscreteElementIds[groupId];
         }
 
+        public Dictionary<long, List<long>> GetFiniteElementGroups()
+        {
+            return _groupElementIds;
+        }
+
         public INode GetDiscreteElementNode(long centerNodeId)
         {
             return _discreteElementNodes[centerNodeId];
@@ -174,6 +179,11 @@ namespace ippt.dem.mesh.repository
         public Dictionary<long, IDiscreteElement> GetDiscreteElements()
         {
             return _discreteElements;
+        }
+
+        public void SetInterfaceBoundary(long elementId)
+        {
+            _elements[elementId].SetInterfaceBoundary(true);
         }
     }
 }

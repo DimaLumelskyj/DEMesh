@@ -27,8 +27,10 @@ namespace ippt.dem.mesh.repository
         public void AddReMeshInputData(long numberOfParticles, double particleRadius);
         public Dictionary<double, long> GetRemeshProperties();
         public List<long> GetDiscreteElementGroup(long groupId);
+        public Dictionary<long, List<long>> GetFiniteElementGroups();
         INode GetDiscreteElementNode(long getCenterNodeId);
         public Dictionary<long, IDiscreteElement> GetDiscreteElements();
+        void SetInterfaceBoundary(long elementId);
     }
 
     public enum FileFormat

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -41,6 +42,10 @@ namespace ippt.dem.mesh.entities.finite.element
         private readonly DiscreteElementCreator _discreteElementCreator;
         
         private readonly IDataRepository _dataRepository;
+
+        private bool _isInterfaceBoundary = false;
+        
+        private bool _isExternalBoundary = false;
 
         public HexahedronElement(ElementDto elementDto,
             DiscreteElementCreator discreteElementCreator,
@@ -119,6 +124,26 @@ namespace ippt.dem.mesh.entities.finite.element
                 PositionInQuadElement.MinusYz);
         }
 
+        public bool IsInterfaceBoundary()
+        {
+            return _isInterfaceBoundary;
+        }
+
+        public void SetInterfaceBoundary(bool isInterfaceBoundary)
+        {
+            _isInterfaceBoundary = isInterfaceBoundary;
+        }
+
+        public bool IsExternalBoundary()
+        {
+            return _isExternalBoundary;
+        }
+
+        public void SetExternalBoundary(bool isExternalBoundary)
+        {
+            _isExternalBoundary = isExternalBoundary; 
+        }
+
         public long GetId()
         {
             return _id;
@@ -134,7 +159,7 @@ namespace ippt.dem.mesh.entities.finite.element
             return _verticesId;
         }
 
-        public IDiscreteElement GetSimpleFilledSphereDiscreteElement(Dictionary<long, INode> elementNodes, long centerNodeId, int groupId)
+        public IDiscreteElement GetSimpleFilledSphereDiscreteElement(Dictionary<long, INode> elementNodes, long centerNodeId, int groupId,  long elementId)
         {
             return _discreteElementCreator
                 .FactoryMethod(
@@ -142,7 +167,8 @@ namespace ippt.dem.mesh.entities.finite.element
                         .Get(centerNodeId,
                             getRadius(GetCenterNodeInElement(elementNodes,centerNodeId),elementNodes[0]),
                             centerNodeId,
-                            groupId)
+                            groupId,
+                            elementId)
                     );
         }
 

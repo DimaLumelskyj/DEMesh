@@ -21,7 +21,27 @@ namespace ippt.dem.mesh.entities.finite.element
             _id = elementDto.GetId();
             _groupId = elementDto.GetGroupId();
         }
-        
+
+        public bool IsInterfaceBoundary()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetInterfaceBoundary(bool isInterfaceBoundary)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool IsExternalBoundary()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetExternalBoundary(bool isExternalBoundary)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public long GetId()
         {
             return _id;
@@ -35,6 +55,12 @@ namespace ippt.dem.mesh.entities.finite.element
         public List<long> GetVerticesId()
         {
             return _verticesId;
+        }
+
+        public IDiscreteElement GetSimpleFilledSphereDiscreteElement(Dictionary<long, INode> elementNodes, long centerNodeId, int groupId,
+            long elementId)
+        {
+            throw new System.NotImplementedException();
         }
 
         public IDiscreteElement GetSimpleFilledSphereDiscreteElement(Dictionary<long, INode> elementNodes, long centerNodeId, int groupId)

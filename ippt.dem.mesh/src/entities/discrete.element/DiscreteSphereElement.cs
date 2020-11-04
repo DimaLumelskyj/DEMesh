@@ -10,10 +10,11 @@ namespace ippt.dem.mesh.entities.discrete.element
         private readonly double _radius;
         private readonly long _nodeId;
         private readonly int _groupId;
-        private const ElementType Type = ElementType.Sphere;
+        private readonly long _finiteElementId;
 
         public DiscreteSphereElement(DiscreteElementDto elementDto)
         {
+            _finiteElementId = elementDto.FiniteElementId;
             _groupId = elementDto.GroupId;
             _nodeId = elementDto.NodeId;
             _radius = elementDto.Radius;
@@ -22,6 +23,7 @@ namespace ippt.dem.mesh.entities.discrete.element
         
         public DiscreteSphereElement(IDiscreteElement element)
         {
+            _finiteElementId = element.GetFiniteElementId();
             _groupId = element.GetGroupId();
             _nodeId = element.GetId();
             _radius = element.GetRadius();
@@ -36,11 +38,6 @@ namespace ippt.dem.mesh.entities.discrete.element
         public long GetId()
         {
             return _id;
-        }
-
-        public new ElementType GetType()
-        {
-            return Type;
         }
 
         public long GetCenterNodeId()
@@ -69,6 +66,11 @@ namespace ippt.dem.mesh.entities.discrete.element
                 default:
                     throw new Exception($"unknown file format: {format}");
             }
+        }
+
+        public long GetFiniteElementId()
+        {
+            return _finiteElementId;
         }
     }
 }

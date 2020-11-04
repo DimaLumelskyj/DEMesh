@@ -53,12 +53,12 @@ namespace ippt.dem.mesh.system.parser
             {
                 ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1), position.GetId());
             }
-
             _dataRepository.LogVolumeInformation();
+            FiniteElementBoundarySearch.SetBoundaryElements(_dataRepository, 2);
             //_dataRepository.SetElementNeighbourElement();
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file ended", DateTime.UtcNow.ToString());
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact", DateTime.UtcNow.ToString());
-           //ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
+            //ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
             _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact ended", DateTime.UtcNow.ToString());
         }
 
@@ -89,7 +89,7 @@ namespace ippt.dem.mesh.system.parser
                         new List<long>( elementData.GetRange(1, 8)),group)));
                     _dataRepository.AddSimpleSphere(_dataRepository
                             .GetElementById(elementData[0])
-                            .GetSimpleFilledSphereDiscreteElement(_dataRepository.GetElementNodes(elementData[0]),elementData[0],group),
+                            .GetSimpleFilledSphereDiscreteElement(_dataRepository.GetElementNodes(elementData[0]),elementData[0], group, elementData[0]),
                         _nodeCreator.FactoryMethod(_dataRepository
                             .GetElementById(elementData[0])
                             .GetCenterNodeInElement(_dataRepository.GetElementNodes(elementData[0]),elementData[0])),

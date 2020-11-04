@@ -7,8 +7,6 @@ namespace ippt.dem.mesh.entities.discrete.element
     {
         public long GetId();
 
-        public ElementType GetType();
-        
         public long GetCenterNodeId();
 
         public double GetRadius();
@@ -16,5 +14,6 @@ namespace ippt.dem.mesh.entities.discrete.element
         public int GetGroupId();
 
         public string ToString(FileFormat format);
+        long GetFiniteElementId();
     }
 }
