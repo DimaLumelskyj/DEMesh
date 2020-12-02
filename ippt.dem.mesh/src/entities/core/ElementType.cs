@@ -3,7 +3,6 @@
     public enum ElementType
     {
         Sphere,
-        Tetrahaedr,
         Hexahedron
     }
 }

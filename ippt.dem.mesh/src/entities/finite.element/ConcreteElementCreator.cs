@@ -27,7 +27,8 @@ namespace ippt.dem.mesh.entities.finite.element
                 case NumberOfVerticesInHexahedron: 
                     return new HexahedronElement(elementDto, _discreteElementCreator, _dataRepository);
                 case NumberOfVerticesInTetrahaedr:
-                    return new TetrahaedrElement(elementDto);
+                    throw new ValidationException(
+                        $"Invalid number of available vertices: {elementDto.GetNodesId().Count}{elementDto}");
                 default:
                     throw new ValidationException(
                         $"Invalid number of available vertices: {elementDto.GetNodesId().Count}{elementDto}");

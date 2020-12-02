@@ -53,13 +53,6 @@ namespace ippt.dem.mesh.system.parser
             {
                 ParseElementsSet(data.GetRange(position.GetBegin()+1,position.GetRange()-1), position.GetId());
             }
-            _dataRepository.LogVolumeInformation();
-            FiniteElementBoundarySearch.SetBoundaryElements(_dataRepository, 2);
-            //_dataRepository.SetElementNeighbourElement();
-            _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file ended", DateTime.UtcNow.ToString());
-            _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact", DateTime.UtcNow.ToString());
-            //ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
-            _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact ended", DateTime.UtcNow.ToString());
         }
 
         private static List<int> GetGroupList(List<Position> positions)

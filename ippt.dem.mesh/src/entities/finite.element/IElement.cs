@@ -12,23 +12,16 @@ namespace ippt.dem.mesh.entities.finite.element
         public void SetInterfaceBoundary(bool isInterfaceBoundary);
         public bool IsExternalBoundary();
         public void SetExternalBoundary(bool isExternalBoundary);
-        
         public long GetId();
-
         public ElementType GetType();
-        
         public List<long> GetVerticesId();
-        
         public IDiscreteElement GetSimpleFilledSphereDiscreteElement(
             Dictionary<long, INode> elementNodes,
             long centerNodeId,
             int groupId,
             long elementId);
-
         public int GetGroup();
         public NodeDto GetCenterNodeInElement(Dictionary<long, INode> getElementNodes, long id);
-
-        public void FindNeighbourElements();
         public double GetVolume();
     }
 }

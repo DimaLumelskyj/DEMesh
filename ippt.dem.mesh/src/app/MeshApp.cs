@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Globalization;
+using ippt.dem.mesh.entities.core;
 using ippt.dem.mesh.entities.discrete.element;
+using ippt.dem.mesh.repository;
 using ippt.dem.mesh.system;
 using ippt.dem.mesh.system.parser;
 using ippt.dem.mesh.system.write;
@@ -23,19 +25,22 @@ namespace ippt.dem.mesh.app
         private readonly IWriteOutputResults _writeOutputResults;
         private readonly ReMeshDiscreteElement _reMeshDiscreteElement;
         private readonly IComaSeparatedDataParser _comaSeparatedDataParser;
+        private readonly IDataRepository _dataRepository;
         public MeshApp(ILogger<MeshApp> log,
             ICoreTextFileRead coreTextFileRead,
             IAbaqusParser abaqusParser,
             IWriteOutputResults writeOutputResults,
             ReMeshDiscreteElement reMeshDiscreteElement,
-            IComaSeparatedDataParser comaSeparatedDataParser)
+            IComaSeparatedDataParser comaSeparatedDataParser,
+            IDataRepository dataRepository)
         {
-            this._log = log;
-            this._coreTextFileRead = coreTextFileRead;
-            this._abaqusParser = abaqusParser;
+            _log = log;
+            _coreTextFileRead = coreTextFileRead;
+            _abaqusParser = abaqusParser;
             _writeOutputResults = writeOutputResults;
             _reMeshDiscreteElement = reMeshDiscreteElement;
             _comaSeparatedDataParser = comaSeparatedDataParser;
+            _dataRepository = dataRepository;
         }
 
         internal void Run(string path,
@@ -47,6 +52,15 @@ namespace ippt.dem.mesh.app
                 "Started",
                 DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
             _abaqusParser.Parse(_coreTextFileRead.ReadFromFile(path));
+            _dataRepository.LogVolumeInformation();
+            NodesToElementsMapper.MapElementsToNodes(_dataRepository);
+            FiniteElementBoundarySearch.SetBoundaryElements(_dataRepository);
+            DiscreteElementOperations.UpdateBoundaryData(_dataRepository);
+            //_dataRepository.SetElementNeighbourElement();
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "parsing data from inp file ended", DateTime.UtcNow.ToString());
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact", DateTime.UtcNow.ToString());
+            //ContactElementSearch.ContactSearchOfHexaElements(_dataRepository);
+            _log.LogInformation("Application {applicationEvent} at {dateTime}", "searching elements in contact ended", DateTime.UtcNow.ToString());
             switch (mesherCase)
             {
                 case StoreRawDemMesh:
@@ -54,7 +68,10 @@ namespace ippt.dem.mesh.app
                     break;
                 case StoreReMeshedDemMesh:
                     _comaSeparatedDataParser.ParseReMeshData(_coreTextFileRead.ReadFromFile(reMeshDataPath));
-                    _reMeshDiscreteElement.Run();
+                    _dataRepository.CleanUpFiniteElementDataInformation();
+                    DiscreteElementOperations.UpdateGrowthAbilityOfDiscreteElementInGroup(_dataRepository, 2);
+                    //_reMeshDiscreteElement.Run();
+                    _writeOutputResults.WriteOutput(path);
                     break;
             }
             _log.LogInformation("Application {applicationEvent} at {dateTime}",

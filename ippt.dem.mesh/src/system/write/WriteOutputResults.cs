@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using ippt.dem.mesh.entities.discrete.element;
 using ippt.dem.mesh.repository;
 using Microsoft.Extensions.Logging;
 
@@ -12,8 +14,10 @@ namespace ippt.dem.mesh.system.write
         private string _fileDirectory;
         private string _outputDatPath;
         private string _outputMshPath;
+        private string _outputResPath;
         private string _outputDatFileName;
         private string _outputMshFileName;
+        private string _outputResFileName;
         private readonly ILogger _log;
         
         public WriteOutputResults(IDataRepository dataRepository,
@@ -41,6 +45,8 @@ namespace ippt.dem.mesh.system.write
                 _outputDatPath = @$"{_fileDirectory}\{_outputDatFileName}";
                 _outputMshFileName = $"{fileNameParsed[0]}.msh";
                 _outputMshPath = @$"{_fileDirectory}\{_outputMshFileName}";
+                _outputResFileName = $"{fileNameParsed[0]}.res";
+                _outputResPath = @$"{_fileDirectory}\{_outputResFileName}";
              }
              else
              {
@@ -48,21 +54,30 @@ namespace ippt.dem.mesh.system.write
                  throw new InvalidDataException($"Parsing file name: {_fileName} error");
              }
         }
+        private void WritingToFiles()
+        {
+            StreamWriter mshStreamWriter = new StreamWriter(_outputMshPath);
+            StreamWriter datStreamWriter = new StreamWriter(_outputDatPath);
+            StreamWriter resStreamWriter = new StreamWriter(_outputResPath);
+            try
+            {
+                WriteMshFile(mshStreamWriter);
+                WriteDatFile(datStreamWriter);
+                WriteResFile(resStreamWriter);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Exception: {e.Message}");
+            }
+            finally
+            {
+                mshStreamWriter.Close();
+                datStreamWriter.Close();
+                resStreamWriter.Close();
+                Console.WriteLine("Executing finally block.");
+            }
+        }
 
-        private void WriteNodeDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
-        {
-            streamWriter.WriteLine(_dataRepository.GetSphereNodeToString(
-                _dataRepository.GetDiscreteElementById(id).GetCenterNodeId(),
-                format));
-        }
-        
-        private void WriteDiscreteElementSphereDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
-        {
-            streamWriter.WriteLine(_dataRepository.GetSphereElementToString(
-                _dataRepository.GetDiscreteElementById(id).GetCenterNodeId(),
-                format));
-        }
-        
         private void WriteMshFile(StreamWriter  mshStreamWriter)
         {
             foreach (var (groupId, elements) in _dataRepository.GetDiscreteElementGroup())
@@ -76,8 +91,20 @@ namespace ippt.dem.mesh.system.write
                 mshStreamWriter.WriteLine("End Elements");
             }
         }
+        
+        private void WriteNodeDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
+        {
+            streamWriter.WriteLine(_dataRepository.GetSphereNodeToString(
+                _dataRepository.GetDiscreteElementById(id).GetCenterNodeId(),
+                format));
+        }
+        
+        private void WriteDiscreteElementSphereDataInGroup(StreamWriter streamWriter, long id, FileFormat format)
+        {
+            streamWriter.WriteLine(_dataRepository.GetSphereElementToString(_dataRepository.GetDiscreteElementById(id).GetCenterNodeId(), format));
+        }
 
-        private void writeDatFile(StreamWriter datStreamWriter)
+        private void WriteDatFile(StreamWriter datStreamWriter)
         {
             datStreamWriter.WriteLine("GEOMETRY_DEFINITION");
             datStreamWriter.WriteLine("        GENERAL:    GSCALE =  1.0");
@@ -103,28 +130,94 @@ namespace ippt.dem.mesh.system.write
                 datStreamWriter.WriteLine($"END_SET_DEFINITION");
             }
         }
-        private void WritingToFiles()
-        {
-            try
-            {
-                StreamWriter mshStreamWriter = new StreamWriter(_outputMshPath);
-                StreamWriter datStreamWriter = new StreamWriter(_outputDatPath);
-
-                WriteMshFile(mshStreamWriter);
-                writeDatFile(datStreamWriter);
-
-                mshStreamWriter.Close();
-                datStreamWriter.Close();
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine($"Exception: {e.Message}");
-            }
-            finally
-            {
-                Console.WriteLine("Executing finally block.");
-            }
-        }
         
+        private void WriteResFile(StreamWriter resStreamWriter)
+        {
+            String[] header = 
+            {
+                "GiD Post Results File 1.0"
+            };
+            header.ToList().ForEach(resStreamWriter.WriteLine);
+            WriteExistingInterfaceSpheres(resStreamWriter);
+            WriteMaxNumberOfGrowthLayesrsAroudSphere(resStreamWriter);
+            //WriteMaxRemeshRadiusSpheres(resStreamWriter);
+        }
+
+        private void WriteExistingInterfaceSpheres(StreamWriter resStreamWriter)
+        {
+            String[] resultsHeader = 
+            {
+                "Result \"Is Interface\" \"Time Step \"   0 Scalar OnNodes",
+                "Values"
+            };
+            String[] resultsEnd = { "End Values" };
+            resultsHeader.ToList().ForEach(resStreamWriter.WriteLine);
+            _dataRepository
+                .GetDiscreteElements()
+                .Values
+                .ToList()
+                .ForEach(element => WriteLineOfInterfaceResult(element, resStreamWriter));
+            resultsEnd.ToList().ForEach(resStreamWriter.WriteLine);
+        }
+
+        private void WriteLineOfInterfaceResult(IDiscreteElement element, StreamWriter resStreamWriter)
+        {
+            if (element.GetGroupId() == 1)
+            {
+                resStreamWriter.WriteLine($"{element.GetId().ToString()} -1");
+                return;
+            }
+
+            resStreamWriter.WriteLine(
+                $"{element.GetId().ToString()} {Convert.ToInt32(element.IsOnInterface()).ToString()}");
+        }
+
+        private void WriteMaxNumberOfGrowthLayesrsAroudSphere(StreamWriter resStreamWriter)
+        {
+            String[] resultsHeader = 
+            {
+                "Result \"Max Number Of Possible Growth\" \"Time Step \"   0 Scalar OnNodes",
+                "Values"
+            };
+            String[] resultsEnd = { "End Values" };
+            resultsHeader.ToList().ForEach(resStreamWriter.WriteLine);
+            _dataRepository
+                .GetDiscreteElements()
+                .Values
+                .ToList()
+                .ForEach(element => WriteLineOfLayerGrowthResult(element, resStreamWriter));
+            resultsEnd.ToList().ForEach(resStreamWriter.WriteLine);
+        }
+
+        private void WriteLineOfLayerGrowthResult(IDiscreteElement element, StreamWriter resStreamWriter)
+        {
+            if (element.GetGroupId() == 1)
+            {
+                resStreamWriter.WriteLine($"{element.GetId().ToString()} -1");
+                return;
+            }
+
+            resStreamWriter.WriteLine($"{element.GetId().ToString()} {element.GetNOfLayersAroundTheElement().ToString()}");
+        }
+
+        private void WriteMaxRemeshRadiusSpheres(StreamWriter resStreamWriter)
+        {
+            String[] resultsHeader = 
+            {
+                "Result \"Max Remesh Radius\" \"Time Step \"   0 Scalar OnNodes",
+                "Values"
+            };
+            String[] resultsEnd = { "End Values" };
+            resultsHeader.ToList().ForEach(resStreamWriter.WriteLine);
+            _dataRepository
+                .GetDiscreteElements()
+                .Values
+                .ToList()
+                .ForEach(element => resStreamWriter
+                    .WriteLine($"{element.GetId().ToString()} {element.GetMaxRadius().ToString()}"));
+            resultsEnd.ToList().ForEach(resStreamWriter.WriteLine);
+        }
     }
+    
+
 }

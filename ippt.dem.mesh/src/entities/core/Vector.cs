@@ -15,5 +15,4 @@ namespace ippt.dem.mesh.entities.core
             double z2 = b.GetCoordinates()[2];
             return Math.Sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)) + (z2-z1)*(z2-z1);
         }
-    }
-}
+    } }

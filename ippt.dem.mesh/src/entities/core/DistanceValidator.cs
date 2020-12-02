@@ -1,4 +1,4 @@
-﻿using ippt.dem.mesh.entities.nodes;
+﻿﻿using ippt.dem.mesh.entities.nodes;
 
 namespace ippt.dem.mesh.entities.core
 {

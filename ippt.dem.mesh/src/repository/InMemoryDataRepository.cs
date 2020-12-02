@@ -183,7 +183,36 @@ namespace ippt.dem.mesh.repository
 
         public void SetInterfaceBoundary(long elementId)
         {
-            _elements[elementId].SetInterfaceBoundary(true);
+            if (!_elements[elementId].IsInterfaceBoundary())
+                _elements[elementId].SetInterfaceBoundary(true);
+        }
+
+        public void UpdateNode(in long id, long elementId, int groupId)
+        {
+            _nodes[id].AddElementInformation(elementId, groupId);
+        }
+
+        public Dictionary<long, INode> GetNodes()
+        {
+            return _nodes;
+        }
+
+        public void UpdateBoundaryDataForDiscreteElement(long id, HashSet<long> setOfNeighboursElements, bool isInterfaceBoundary)
+        {
+            _discreteElements[id]
+                .UpdateBoundaryData(setOfNeighboursElements, isInterfaceBoundary);
+        }
+
+        public void UpdateMaxDiscreteElementPossibleRemeshNumberOfLayers(long id, in int iteration)
+        {
+            _discreteElements[id].SetNOfLayersAroundTheElement(iteration);
+        }
+        
+        public double GetRemeshMaxRadius()
+        {
+            List<double> remeshRadius = _remeshProperties.Keys.ToList();
+            remeshRadius.Sort((a, b) => b.CompareTo(a));
+            return remeshRadius.First();
         }
     }
 }

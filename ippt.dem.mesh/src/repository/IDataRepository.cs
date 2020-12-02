@@ -31,6 +31,13 @@ namespace ippt.dem.mesh.repository
         INode GetDiscreteElementNode(long getCenterNodeId);
         public Dictionary<long, IDiscreteElement> GetDiscreteElements();
         void SetInterfaceBoundary(long elementId);
+        void UpdateNode(in long id, long getId, int getGroup);
+        public Dictionary<long, INode> GetNodes();
+        void UpdateBoundaryDataForDiscreteElement(long id,
+            HashSet<long> setOfNeighboursElements,
+            bool isInterfaceBoundary);
+        void UpdateMaxDiscreteElementPossibleRemeshNumberOfLayers(long getId, in int iteration);
+        public double GetRemeshMaxRadius();
     }
 
     public enum FileFormat

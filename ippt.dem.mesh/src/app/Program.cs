@@ -17,7 +17,7 @@ namespace ippt.dem.mesh.app
         private static void Main(string[] args)
         {
             
-            string path = @"C:\Users\dimal\RiderProjects\DEMesh\ippt.dem.mesh\bin\Debug\netcoreapp3.1\1_50.inp";
+            string path = @"C:\Users\dimal\RiderProjects\DEMesh\ippt.dem.mesh\bin\Debug\netcoreapp3.1\1_200.inp";
             string reMeshDataPath = @"C:\Users\dimal\Desktop\RemeshData_1_50.txt";
 
             var services = new ServiceCollection();
